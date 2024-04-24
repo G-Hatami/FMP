@@ -7,6 +7,8 @@ import UserGroupManagement from "../views/UserGroupManagement.vue";
 import Settings from "../views/Settings.vue";
 import createUser from "../views/UserManagement/CreateUser.vue"
 import updateUser from "../views/UserManagement/UpdateUser.vue"
+import UsersTable from "../views/MainTable/UsersTable.vue";
+import VirtualLogin from "../views/VirtualLogin.vue";
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -17,7 +19,6 @@ const router = createRouter({
         },
         {
             path: "/filesManagement",
-            // component: () => import("../views/FilesManagement.vue")
             component: FilesManagement
         },
         {
@@ -43,6 +44,14 @@ const router = createRouter({
         {
             path:"/updateUser",
             component:updateUser
+        },
+        {
+            path:"/usersTable",
+            component:UsersTable
+        },
+        {
+            path:"/virtualLogin",
+            component:VirtualLogin
         }
 
     ]

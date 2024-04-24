@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="handleSubmit">
     <label>User name:</label>
-    <input type="text" maxlength="48" minlength="5" readonly required v-model="userInfo.userName">
+    <input type="text" maxlength="48" minlength="5" onblur="this.disabled=true" required v-model="userInfo.userName">
 
     <label>First name:</label>
     <input type="text" maxlength="48" v-model=userInfo.firstName>

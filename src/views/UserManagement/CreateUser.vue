@@ -1,48 +1,50 @@
 <template>
   <form @submit.prevent="handleSubmit">
     <label>User name:</label>
-    <input type="text" maxlength="48" minlength="5" readonly required v-model="userInfo.userName">
+    <input type="text" maxlength="48" minlength="5" required v-model="username" onblur="this.disabled=true">
 
     <label>First name:</label>
-    <input type="text" maxlength="48" v-model=userInfo.firstName>
+    <input type="text" maxlength="48" v-model=firstname>
 
     <label>Last name:</label>
-    <input type="text" maxlength="48" v-model=userInfo.lastName>
+    <input type="text" maxlength="48" v-model=lastname>
+    <label>User Group:</label>
+    <input type="text" maxlength="48" v-model=usergroup>
+
     <div class="createTable">
       <div class="option">
         <label>Creator:</label>
-        <input type="text" v-model=userInfo.userGroup>
+        <input type="text" v-model=creator>
       </div>
 
       <div class="timeInput">
         <label>creationTime:</label>
-        <input type="text" v-model=userInfo.userGroup>
+        <input type="text" v-model=creationTime>
       </div>
     </div>
 
     <div class="updateTable">
       <div class="option">
         <label>lastModifier</label>
-        <input type="text" v-model=userInfo.userGroup>
+        <input type="text" v-model=lastModifier>
       </div>
       <div class="timeInput">
         <label>lastModificationTime:</label>
-        <input type="text" v-model=userInfo.userGroup>
+        <input type="text" v-model=lastModificationTime>
       </div>
     </div>
 
     <label>Type:</label>
-    <select v-model="userInfo.type" required>
+    <select v-model="type" required>
       <option value="Admin">Admin</option>
       <option value="User">User</option>
     </select>
     <div class="submit">
-      <button>Create an Account</button>
+      <button @click="addUser" style="font-weight: bolder">Create the User</button>
     </div>
     <div class="termsBox">
       <input type="checkbox" v-model="terms" required>
       <label id="boxLabel">Accept terms and conditions </label>
-
 
 
     </div>
@@ -60,7 +62,8 @@
         exercitationem minima nisi odio perspiciatis, possimus quis reiciendis repudiandae sed unde voluptatibus
         voluptatum! Eius, nam.
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti dolorum quidem quo totam ut? Accusantium
-        beatae, cumque facilis nisi odit porro quis quisquam quos repellendus sint. Animi delectus eveLorem ipsum dolor sit amet, consectetur adipisicing elit. Ab assumenda aut consequatur dicta expedita explicabo
+        beatae, cumque facilis nisi odit porro quis quisquam quos repellendus sint. Animi delectus eveLorem ipsum dolor
+        sit amet, consectetur adipisicing elit. Ab assumenda aut consequatur dicta expedita explicabo
         fugit impedit minus mollitia natus nesciunt nulla optio quidem quis quod repellat sint tenetur, voluptates.
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. A, alias, at commodi delectus distinctio dolor
         exercitationem minima nisi odio perspiciatis, possimus quis reiciendis repudiandae sed unde voluptatibus
@@ -72,23 +75,40 @@
 
 </template>
 <script setup>
-import {ref} from "vue";
+import {ref, getCurrentInstance } from "vue";
+const emitInstance = getCurrentInstance()
 
-const userInfo = ref({
-  userName: '',
-  firstName: '',
-  lastName: '',
-  userGroup: '',
-  type: '',
-  creator: '',
-  creationTime: '',
-  lastModifier: '',
-  lastModificationTime: ''
-})
+const username = ref(" ")
+const lastname = ref(" ")
+const firstname = ref(" ")
+const usergroup = ref(" ")
+const type = ref(" ")
+const creator = ref(" ")
+const creationTime = ref(" ")
+const lastModifier = ref(" ")
+const lastModificationTime = ref(" ")
+
+
 const terms = ref(false)
 const handleSubmit = () => {
 
 }
+
+const addUser = () => {
+  const newUser = {
+    userName: username.value,
+    firstName: firstname.value,
+    lastName: lastname.value,
+    userGroup: usergroup.value,
+    type: type.value,
+    creator: creator.value,
+    creationTime: creationTime.value,
+    lastModifier: lastModifier.value,
+    lastModificationTime: lastModificationTime.value
+  };
+    emitInstance.emit("userAdded", newUser)
+}
+
 
 </script>
 
@@ -116,7 +136,8 @@ form label {
   letter-spacing: 1px;
   font-weight: bold;
 }
-form input{
+
+form input {
   margin-bottom: 7px;
 }
 
@@ -137,7 +158,7 @@ select:hover {
 }
 
 form button {
-  background: hsl(210, 20% , 55%);
+  background: hsl(210, 20%, 55%);
   border: 0;
   padding: 10px 20px;
   margin-top: 20px;
@@ -148,36 +169,41 @@ form button {
   bottom: 3rem;
 
 }
-.terms{
-  background-color:hsl(210, 20% , 55%);
+
+.terms {
+  background-color: hsl(210, 20%, 55%);
   position: absolute;
-  right: 2rem ;
+  right: 2rem;
   top: 2rem;
   width: 20rem;
-  height:35rem ;
+  height: 35rem;
   overflow-y: auto;
   color: #dddddd;
   font-weight: bolder;
   border-radius: 5px;
   padding: 10px;
 }
-.termsBox{
+
+.termsBox {
   position: absolute;
   bottom: 3rem;
   left: 15rem;
-  display:flex;
+  display: flex;
   align-items: center;
   color: #dddddd;
   font-size: 40px;
 
 }
-input[type="checkbox"]{
+
+input[type="checkbox"] {
   margin-right: 8px;
 }
-.option{
+
+.option {
   width: 58%;
 }
-.timeInput{
+
+.timeInput {
   width: 42%;
 }
 

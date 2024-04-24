@@ -27,6 +27,10 @@
         <span class="material-icons">storage</span>
         <span class="text">Storage space</span>
       </router-link>
+      <router-link to="/virtualLogin" class="button" exact>
+        <span class="material-icons">login</span>
+        <span class="text">Login</span>
+      </router-link>
       <div class="settings">
         <router-link to="/settings" class="button" id="settings" exact>
           <span class="material-icons">settings</span>
@@ -46,8 +50,6 @@ const toggleMenu = () => {
 
   is_expanded.value = !is_expanded.value
   // localStorage.setItem("is_expanded", is_expanded.value.toString())
-
-
 }
 
 
