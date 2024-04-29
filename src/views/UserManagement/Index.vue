@@ -1,5 +1,4 @@
 <template>
-<users-table></users-table>
   <div class="container">
     <div class="input-group">
       <label for="input2">DELETE :</label>
@@ -21,8 +20,8 @@
 
 <script setup>
 import {useRouter} from "vue-router";
-import {ref} from "vue";
-import UsersTable from "../MainTable/UsersTable.vue";
+
+
 const router = useRouter();
 
 // Function to navigate to update user page

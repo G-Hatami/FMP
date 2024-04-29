@@ -1,5 +1,5 @@
 <template>
-  <CreateUser @userAdded="handleUserAdded"></CreateUser>
+  <h2>hello table</h2>
   <div class="table-container">
     <table id="recordTable">
       <thead>
@@ -13,7 +13,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="user in users" :key="user.id">
+      <tr v-for="user in useStore.users" :key="user.id">
         <td>{{ user.id }}</td>
         <td>{{ user.username }}</td>
         <td>{{ user.firstname }}</td>
@@ -28,27 +28,13 @@
 
 
 <script setup>
-import {ref , onMounted , onUnmounted} from "vue";
-import CreateUser from "../UserManagement/CreateUser.vue";
+import {useUserStore} from "../../stores/userStore";
 
-    const users = ref([
-      {id: 1, username: "G.Hatami2004", firstname: "Goli", lastname: "Hatami", type: "Admin", usergroup: "Admins"},
-      {id: 1, username: "G.Hatami2004", firstname: "Goli", lastname: "Hatami", type: "Admin", usergroup: "Admins"},
-      {id: 1, username: "G.Hatami2004", firstname: "Goli", lastname: "Hatami", type: "Admin", usergroup: "Admins"},
-      {id: 1, username: "G.Hatami2004", firstname: "Goli", lastname: "Hatami", type: "Admin", usergroup: "Admins"},
-      {id: 1, username: "G.Hatami2004", firstname: "Goli", lastname: "Hatami", type: "Admin", usergroup: "Admins"},
-      {id: 1, username: "G.Hatami2004", firstname: "Goli", lastname: "Hatami", type: "Admin", usergroup: "Admins"},
-    ]);
-    const handleUserAdded = (newUser) => {
-      console.log("new user: " , newUser.lastname)}
-    // }
-    // onMounted(() => {
-    //   const handler = (newUser) => addUser(newUser);
-    //   emit("usersAdded", handler);
-    // });
-    // onUnmounted(() => {
-    //   emit('usersAdded', null);
-    // });
+
+const useStore = useUserStore();
+
+
+
 
 
 

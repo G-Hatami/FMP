@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="handleSubmit">
     <label>User name:</label>
-    <input type="text" maxlength="48" minlength="5" required v-model="username" onblur="this.disabled=true">
+    <input type="text" maxlength="48" minlength="5" required v-model="username" onblur="disabled=true">
 
     <label>First name:</label>
     <input type="text" maxlength="48" v-model=firstname>
@@ -40,7 +40,7 @@
       <option value="User">User</option>
     </select>
     <div class="submit">
-      <button @click="addUser" style="font-weight: bolder">Create the User</button>
+      <button style="font-weight: bolder" @click="createUser">Create the User</button>
     </div>
     <div class="termsBox">
       <input type="checkbox" v-model="terms" required>
@@ -75,8 +75,9 @@
 
 </template>
 <script setup>
-import {ref, getCurrentInstance } from "vue";
-const emitInstance = getCurrentInstance()
+import {ref} from "vue";
+
+
 
 const username = ref(" ")
 const lastname = ref(" ")
@@ -88,13 +89,7 @@ const creationTime = ref(" ")
 const lastModifier = ref(" ")
 const lastModificationTime = ref(" ")
 
-
-const terms = ref(false)
-const handleSubmit = () => {
-
-}
-
-const addUser = () => {
+const createUser = () => {
   const newUser = {
     userName: username.value,
     firstName: firstname.value,
@@ -106,7 +101,12 @@ const addUser = () => {
     lastModifier: lastModifier.value,
     lastModificationTime: lastModificationTime.value
   };
-    emitInstance.emit("userAdded", newUser)
+  userStore.addUser(newUser)
+}
+
+
+const terms = ref(false)
+const handleSubmit = () => {
 }
 
 

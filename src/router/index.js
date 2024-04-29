@@ -10,7 +10,7 @@ import updateUser from "../views/UserManagement/UpdateUser.vue"
 import UsersTable from "../views/MainTable/UsersTable.vue";
 import VirtualLogin from "../views/VirtualLogin.vue";
 
-const router = createRouter({
+ const router = createRouter({
     history: createWebHashHistory(),
     routes: [
         {

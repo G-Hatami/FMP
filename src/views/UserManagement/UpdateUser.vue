@@ -37,7 +37,7 @@
       <option value="User">User</option>
     </select>
     <div class="submit">
-      <button>Create an Account</button>
+      <button>Update the user</button>
     </div>
     <div class="termsBox">
       <input type="checkbox" v-model="terms" required>
