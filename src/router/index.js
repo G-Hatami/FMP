@@ -3,7 +3,7 @@ import Sidebar from "../components/Sidebar.vue";
 import FilesManagement from "../views/FilesManagement.vue";
 import UsersManagement from "../views/UserManagement/Index.vue";
 import StorageSpace from "../views/StorageSpace.vue";
-import UserGroupManagement from "../views/UserGroupManagement.vue";
+import UserGroupManagement from "../views/UsersGroupManagement/UserGroupManagement.vue";
 import Settings from "../views/Settings.vue";
 import createUser from "../views/UserManagement/CreateUser.vue"
 import updateUser from "../views/UserManagement/UpdateUser.vue"

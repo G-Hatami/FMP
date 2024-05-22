@@ -1,82 +1,88 @@
 <template>
-  <form @submit.prevent="handleSubmit">
-    <label>User name:</label>
+   <form @submit.prevent="handleSubmit">
+    <label>{{ $t('User name') }}:</label>
     <input type="text" maxlength="48" minlength="5" required v-model="username" onblur="disabled=true">
 
-    <label>First name:</label>
+    <label>{{ $t('First name') }}:</label>
     <input type="text" maxlength="48" v-model=firstname>
 
-    <label>Last name:</label>
+    <label>{{ $t('Last name') }}:</label>
     <input type="text" maxlength="48" v-model=lastname>
-    <label>User Group:</label>
+    <label>{{ $t('User Group') }}:</label>
     <input type="text" maxlength="48" v-model=usergroup>
 
     <div class="createTable">
       <div class="option">
-        <label>Creator:</label>
+        <label>{{ $t('Creator') }}:</label>
         <input type="text" v-model=creator>
       </div>
 
       <div class="timeInput">
-        <label>creationTime:</label>
+        <label>{{ $t('creationTime') }}:</label>
         <input type="text" v-model=creationTime>
       </div>
     </div>
 
     <div class="updateTable">
       <div class="option">
-        <label>lastModifier</label>
+        <label>{{ $t('lastModifier') }}</label>
         <input type="text" v-model=lastModifier>
       </div>
       <div class="timeInput">
-        <label>lastModificationTime:</label>
+        <label>{{ $t('lastModificationTime') }}:</label>
         <input type="text" v-model=lastModificationTime>
       </div>
     </div>
 
-    <label>Type:</label>
+    <label>{{ $t('Type') }}:</label>
     <select v-model="type" required>
-      <option value="Admin">Admin</option>
-      <option value="User">User</option>
+      <option value="Admin">{{ $t('Admin') }}</option>
+      <option value="User">{{ $t('User') }}</option>
     </select>
     <div class="submit">
-      <button style="font-weight: bolder" @click="createUser">Create the User</button>
+      <button style="font-weight: bolder" @click="createUser" :disabled="!canCreateUser">{{ $t('Create the User') }}
+      </button>
     </div>
     <div class="termsBox">
       <input type="checkbox" v-model="terms" required>
-      <label id="boxLabel">Accept terms and conditions </label>
+      <label id="boxLabel">{{ $t('Accept terms and conditions') }} </label>
 
 
     </div>
     <div class="terms">
-      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab assumenda aut consequatur dicta expedita explicabo
-        fugit impedit minus mollitia natus nesciunt nulla optio quidem quis quod repellat sint tenetur, voluptates.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. A, alias, at commodi delectus distinctio dolor
+      <p>
+        `Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab assumenda aut consequatur dicta expedita explicabo
+        "fugit impedit minus mollitia natus nesciunt nulla optio quidem quis quod repellat sint tenetur,
+        voluptates.Lorem ipsum dolor sit amet, consectetur adipisicing elit.A, alias, at commodi delectus distinctio
+        dolor
+        "exercitationem minima nisi odio perspiciatis, possimus quis reiciendis repudiandae sed unde voluptatibus
+        "voluptatum!Eius, nam.Lorem ipsum dolor sit amet, consectetur adipisicing elit.Deleniti dolorum quidem quo totam
+        ut ? Accusantium
+        beatae, cumque facilis nisi odit porro quis quisquam quos repellendus sint.Animi delectus eveniet quaerat ?
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit.Ab assumenda aut consequatur dicta expedita explicabo
+        fugit impedit minus mollitia natus nesciunt nulla optio quidem quis quod repellat sint tenetur, voluptates.Lorem
+        ipsum dolor sit amet, consectetur adipisicing elit.A, alias, at commodi delectus distinctio dolor
         exercitationem minima nisi odio perspiciatis, possimus quis reiciendis repudiandae sed unde voluptatibus
-        voluptatum! Eius, nam.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti dolorum quidem quo totam ut? Accusantium
-        beatae, cumque facilis nisi odit porro quis quisquam quos repellendus sint. Animi delectus eveniet quaerat?
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab assumenda aut consequatur dicta expedita explicabo
-        fugit impedit minus mollitia natus nesciunt nulla optio quidem quis quod repellat sint tenetur, voluptates.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. A, alias, at commodi delectus distinctio dolor
+        voluptatum!Eius, nam.Lorem ipsum dolor sit amet, consectetur adipisicing elit.Deleniti dolorum quidem quo totam
+        ut ? Accusantium
+        beatae, cumque facilis nisi odit porro quis quisquam quos repellendus sint.Animi delectus eveLorem ipsum dolor
+        sit amet, consectetur adipisicing elit.Ab assumenda aut consequatur dicta expedita explicabo
+        fugit impedit minus mollitia natus nesciunt nulla optio quidem quis quod repellat sint tenetur, voluptates.Lorem
+        ipsum dolor sit amet, consectetur adipisicing elit.A, alias, at commodi delectus distinctio dolor
         exercitationem minima nisi odio perspiciatis, possimus quis reiciendis repudiandae sed unde voluptatibus
-        voluptatum! Eius, nam.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti dolorum quidem quo totam ut? Accusantium
-        beatae, cumque facilis nisi odit porro quis quisquam quos repellendus sint. Animi delectus eveLorem ipsum dolor
-        sit amet, consectetur adipisicing elit. Ab assumenda aut consequatur dicta expedita explicabo
-        fugit impedit minus mollitia natus nesciunt nulla optio quidem quis quod repellat sint tenetur, voluptates.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. A, alias, at commodi delectus distinctio dolor
-        exercitationem minima nisi odio perspiciatis, possimus quis reiciendis repudiandae sed unde voluptatibus
-        voluptatum! Eius, nam.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti dolorum quidem quo totam ut? Accusantium
-        beatae, cumque facilis nisi odit porro quis quisquam quos repellendus sint. Animi delectus eve</p>
+        voluptatum!Eius, nam.Lorem ipsum dolor sit amet, consectetur adipisicing elit.Deleniti dolorum quidem quo totam
+        ut ? Accusantium
+        beatae, cumque facilis nisi odit porro quis quisquam quos repellendus sint.Animi delectus eve</p>
+
     </div>
   </form>
 
 </template>
 <script setup>
-import {ref} from "vue";
+import {computed, ref} from "vue";
+import {useUserStore} from "../../stores/userStore";
 
+const userStore = useUserStore()
 
 
 const username = ref(" ")
@@ -88,24 +94,30 @@ const creator = ref(" ")
 const creationTime = ref(" ")
 const lastModifier = ref(" ")
 const lastModificationTime = ref(" ")
+const terms = ref(false)
+
+// to handle the conditions of creating the user
+const canCreateUser = computed(() => {
+  return username.value.trim() !== "" && type.value !== " " && terms.value !== false;
+})
 
 const createUser = () => {
   const newUser = {
-    userName: username.value,
-    firstName: firstname.value,
-    lastName: lastname.value,
-    userGroup: usergroup.value,
+    username: username.value,
+    firstname: firstname.value,
+    lastname: lastname.value,
+    usergroup: usergroup.value,
     type: type.value,
     creator: creator.value,
     creationTime: creationTime.value,
     lastModifier: lastModifier.value,
-    lastModificationTime: lastModificationTime.value
+    lastModificationTime: lastModificationTime.value,
   };
+
   userStore.addUser(newUser)
 }
 
 
-const terms = ref(false)
 const handleSubmit = () => {
 }
 

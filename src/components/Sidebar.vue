@@ -31,26 +31,50 @@
         <span class="material-icons">login</span>
         <span class="text">Login</span>
       </router-link>
+      <select class="custom-select" v-model="lang" @change="data.updateLang($event.target.value)">
+        <option value="EN">English</option>
+        <option value="FA">فارسی</option>
+        <option></option>
+      </select>
       <div class="settings">
         <router-link to="/settings" class="button" id="settings" exact>
           <span class="material-icons">settings</span>
           <span class="text">Settings</span>
         </router-link>
+
       </div>
     </div>
   </aside>
 </template>
 <script setup>
 import {ref} from "vue";
+import i18n from "../i18n";
+
+const lang = ref(localStorage.getItem('lang') || 'en');
+function updateLang(newLang) {
+  console.log(i18n)
+  lang.value = newLang;
+  i18n.global.locale = lang.value
+  localStorage.setItem('lang', newLang);
+}
+
+// Return variables and functions needed in the template
+const data = {
+  lang,
+  updateLang
+};
+
 
 
 // const is_expanded = ref(localStorage.getItem("is_expanded") === "true");
 const is_expanded = ref(false)
 const toggleMenu = () => {
-
   is_expanded.value = !is_expanded.value
   // localStorage.setItem("is_expanded", is_expanded.value.toString())
 }
+
+
+
 
 
 </script>

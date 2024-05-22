@@ -1,33 +1,36 @@
 <template>
   <form @submit.prevent="handleSubmit">
+    <p id="ID"> ID: </p>
     <label>User name:</label>
-    <input type="text" maxlength="48" minlength="5" onblur="this.disabled=true" required v-model="userInfo.userName">
+    <input type="text" maxlength="48" minlength="5" onblur="this.disabled=true" required v-model="userInfo.username">
 
     <label>First name:</label>
-    <input type="text" maxlength="48" v-model=userInfo.firstName>
+    <input type="text" maxlength="48" v-model=userInfo.firstname>
 
     <label>Last name:</label>
-    <input type="text" maxlength="48" v-model=userInfo.lastName>
+    <input type="text" maxlength="48" v-model=userInfo.lastname>
+    <label>{{ $t('User Group') }}:</label>
+    <input type="text" maxlength="48" v-model=userInfo.usergroup>
     <div class="createTable">
       <div class="option">
         <label>Creator:</label>
-        <input type="text" v-model=userInfo.userGroup>
+        <input type="text" v-model=userInfo.creator>
       </div>
 
       <div class="timeInput">
         <label>creationTime:</label>
-        <input type="text" v-model=userInfo.userGroup>
+        <input type="text" v-model=userInfo.creationTime>
       </div>
     </div>
 
     <div class="updateTable">
       <div class="option">
         <label>lastModifier</label>
-        <input type="text" v-model=userInfo.userGroup>
+        <input type="text" v-model=userInfo.lastModifier>
       </div>
       <div class="timeInput">
         <label>lastModificationTime:</label>
-        <input type="text" v-model=userInfo.userGroup>
+        <input type="text" v-model=userInfo.lastModificationTime>
       </div>
     </div>
 
@@ -37,7 +40,7 @@
       <option value="User">User</option>
     </select>
     <div class="submit">
-      <button>Update the user</button>
+      <button @click="handleUpdates">Update the user</button>
     </div>
     <div class="termsBox">
       <input type="checkbox" v-model="terms" required>
@@ -68,17 +71,24 @@
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti dolorum quidem quo totam ut? Accusantium
         beatae, cumque facilis nisi odit porro quis quisquam quos repellendus sint. Animi delectus eve</p>
     </div>
+
   </form>
 
 </template>
 <script setup>
-import {ref} from "vue";
+import {ref, onMounted} from "vue";
+import {useUserStore} from "../../stores/userStore";
+import {useRoute} from "vue-router";
+
+const route = useRoute();
+const userStore = useUserStore()
 
 const userInfo = ref({
-  userName: '',
-  firstName: '',
-  lastName: '',
-  userGroup: '',
+  id: " ",
+  username: '',
+  firstname: '',
+  lastname: '',
+  usergroup: '',
   type: '',
   creator: '',
   creationTime: '',
@@ -88,6 +98,36 @@ const userInfo = ref({
 const terms = ref(false)
 const handleSubmit = () => {
 }
+
+
+onMounted(() => {
+  const userIdParam = route.query.id;
+  const userId = Array.isArray(userIdParam) ? parseInt(userIdParam[0], 10) : parseInt(userIdParam, 10);
+  if (!isNaN(userId)) {
+    const foundUser = userStore.findId(userId);
+    if (foundUser) {
+      userInfo.value.id = foundUser.id;
+      userInfo.value.username = foundUser.username;
+      userInfo.value.firstname = foundUser.firstname;
+      userInfo.value.lastname = foundUser.lastname;
+      userInfo.value.usergroup = foundUser.usergroup;
+      userInfo.value.type = foundUser.type;
+    }
+  }
+});
+
+const handleUpdates = () => {
+  const updatedUser = {
+    id: userInfo.value.id,
+    username: userInfo.value.username,
+    firstname: userInfo.value.firstname,
+    lastname: userInfo.value.lastname,
+    usergroup: userInfo.value.usergroup,
+    type: userInfo.value.type
+  }
+  userStore.updateUser(updatedUser)
+}
+
 
 </script>
 <style scoped lang="scss">
@@ -161,6 +201,12 @@ form button {
   padding: 10px;
 }
 
+#ID {
+  position: absolute;
+  top: 1.3rem;
+  font-weight: bolder;
+}
+
 .termsBox {
   position: absolute;
   bottom: 3rem;
@@ -183,6 +229,7 @@ input[type="checkbox"] {
 .timeInput {
   width: 42%;
 }
+
 .submit {
   text-align: center;
 }

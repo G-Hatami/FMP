@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f26b9664-9738-4963-819a-9af72d489896" name="Changes" comment="create new users">
+      <change afterPath="$PROJECT_DIR$/../.git.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../public.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/i18n.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/i18n/en.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/i18n/fa.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/components/Sidebar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../src/components/Sidebar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/stores/userStore.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/stores/userStore.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/views/Settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../src/views/Settings.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/views/UserGroupManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../src/views/UserGroupManagement.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/views/UserManagement/CreateUser.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../src/views/UserManagement/CreateUser.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/views/UserManagement/Index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../src/views/UserManagement/Index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/views/UserManagement/UpdateUser.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../src/views/UserManagement/UpdateUser.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/views/VirtualLogin.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../src/views/VirtualLogin.vue" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Vue Composition API Component" />
+        <option value="package.json" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/userStore.js" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2ej0oN4dlM82YK6GgwlPRE64kF4" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;20.12.1&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;20.12.1&quot;,
+    &quot;last_opened_file_path&quot;: &quot;F:/PRGRMMING/javaScript/webstormExercises/test1&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;Settings.JavaScript&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2023.2.3\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="F:\PRGRMMING\javaScript\frameWorks\Vue\FMP\file-management\file-management\file-management\src" />
+      <recent name="F:\PRGRMMING\javaScript\frameWorks\Vue\FMP\file-management\file-management\file-management\src\assets" />
+      <recent name="F:\PRGRMMING\javaScript\frameWorks\Vue\FMP\file-management\file-management\file-management\src\stores" />
+      <recent name="F:\PRGRMMING\javaScript\frameWorks\Vue\FMP\file-management\file-management\file-management\src\views\MainTable" />
+      <recent name="F:\PRGRMMING\javaScript\frameWorks\Vue\FMP\file-management\file-management\file-management\src\views\UserManagement" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f26b9664-9738-4963-819a-9af72d489896" name="Changes" comment="" />
+      <created>1712402854560</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1712402854560</updated>
+      <workItem from="1712402856273" duration="13594000" />
+      <workItem from="1712471369287" duration="22244000" />
+      <workItem from="1712593216169" duration="2553000" />
+      <workItem from="1712597168467" duration="4973000" />
+      <workItem from="1712833965580" duration="9634000" />
+      <workItem from="1712863113715" duration="5529000" />
+      <workItem from="1712988070194" duration="3988000" />
+      <workItem from="1712997065660" duration="4167000" />
+      <workItem from="1713032188861" duration="2762000" />
+      <workItem from="1713068472736" duration="5408000" />
+      <workItem from="1713075136292" duration="9943000" />
+      <workItem from="1713161041054" duration="4813000" />
+      <workItem from="1713176324866" duration="6083000" />
+      <workItem from="1713345234906" duration="4499000" />
+      <workItem from="1713609476083" duration="5751000" />
+      <workItem from="1713673947564" duration="10329000" />
+      <workItem from="1713859347536" duration="20000" />
+      <workItem from="1713862381439" duration="5216000" />
+      <workItem from="1713934046221" duration="5777000" />
+      <workItem from="1713940366546" duration="1961000" />
+      <workItem from="1713946414121" duration="625000" />
+      <workItem from="1714197674524" duration="8099000" />
+      <workItem from="1714288990901" duration="2107000" />
+      <workItem from="1714366208942" duration="4549000" />
+      <workItem from="1714381198881" duration="6746000" />
+      <workItem from="1714883327414" duration="7183000" />
+      <workItem from="1714893615162" duration="1000" />
+      <workItem from="1715059066929" duration="2268000" />
+      <workItem from="1715446652356" duration="2149000" />
+      <workItem from="1715507007992" duration="4203000" />
+      <workItem from="1715575342163" duration="9046000" />
+      <workItem from="1715747735566" duration="3179000" />
+      <workItem from="1715751306377" duration="2937000" />
+      <workItem from="1715842782541" duration="5303000" />
+      <workItem from="1715848612940" duration="136000" />
+      <workItem from="1715848768973" duration="2281000" />
+      <workItem from="1716016221828" duration="49000" />
+      <workItem from="1716016307465" duration="262000" />
+      <workItem from="1716016580427" duration="24000" />
+      <workItem from="1716016653707" duration="66000" />
+      <workItem from="1716032036739" duration="224000" />
+    </task>
+    <task id="LOCAL-00001" summary="file management">
+      <option name="closed" value="true" />
+      <created>1713345717622</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1713345717625</updated>
+    </task>
+    <task id="LOCAL-00002" summary="create and update page">
+      <option name="closed" value="true" />
+      <created>1713619133524</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1713619133524</updated>
+    </task>
+    <task id="LOCAL-00003" summary="create new users">
+      <option name="closed" value="true" />
+      <created>1713946444568</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1713946444568</updated>
+    </task>
+    <task id="LOCAL-00004" summary="create new users">
+      <option name="closed" value="true" />
+      <created>1714384227418</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1714384227418</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="file management" />
+    <MESSAGE value="create and update page" />
+    <MESSAGE value="create new users" />
+    <option name="LAST_COMMIT_MESSAGE" value="create new users" />
+  </component>
+</project>
