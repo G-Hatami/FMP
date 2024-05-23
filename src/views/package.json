@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "@syncfusion/ej2-vue-dropdowns": "^25.2.5",
-    "vue-multi-select": "^4.6.0",
-    "vue-multiselect": "^3.0.0"
-  }
-}

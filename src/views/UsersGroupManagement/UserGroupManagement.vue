@@ -7,28 +7,31 @@
 
     <div>
       <label>Users :</label>
-      <Multiselect
-          v-model="values"
-          search
-          historyButton
-          :filters="filters"
-          :options="options"
-          :selectOptions="users"/>
+      <!--      <Multiselect-->
+      <!--          v-model="values"-->
+      <!--          search-->
+      <!--          historyButton-->
+      <!--          :filters="filters"-->
+      <!--          :options="options"-->
+      <!--          :selectOptions="users"/>-->
     </div>
     <div>
-      <select id="dynamicSelect" v-model="selected" multiple>
+      <select id="dynamicSelect" v-model="selected">
         <option v-for="user in users" :key="user.username" :value="user.username">
           {{ user.username }}
         </option>
       </select>
     </div>
-
-    <ul>
-      <li v-for="user in selected" :key="user.id">{{ user.name }}</li>
-    </ul>
-
-
+    <!--    <ul>-->
+    <!--      <li v-for="user in selected" :key="user.username">{{ user.name }}</li>-->
+    <!--    </ul>-->
     <button @click="createGroup">Create Group</button>
+    <!--    <label>Group Members:</label>-->
+    <div class="groupMember">
+      <div v-for="select in selected">
+        {{ select }}
+      </div>
+    </div>
   </form>
 
 
@@ -37,7 +40,7 @@
 
 <script setup>
 import 'vue-multi-select/dist/lib/vue-multi-select.css';
-import Multiselect from 'vue-multiselect'
+// import Multiselect from 'vue-multiselect'
 import {useUserStore} from "../../stores/userStore";
 import {onMounted, ref} from "vue";
 // import {DropDownListComponent as EjsDropdownlist} from "@syncfusion/ej2-vue-dropdowns";
@@ -45,7 +48,6 @@ import {onMounted, ref} from "vue";
 
 const userStore = useUserStore()
 const users = ref([])
-// const value = ref(null)
 const selected = ref([])
 const groups = ref([])
 
@@ -54,44 +56,39 @@ onMounted(() => {
 })
 const createGroup = () => {
   if (selected.value.length > 0) {
-    groups.value.push(selected.value)
+    groups.value.push(...selected.value)
     selected.value = []
   } else {
     alert("please select at least one user to create a group")
   }
-
 }
-const filters = ref([
-  {
-    nameAll: 'Select all',
-    nameNotAll: 'Deselect all',
-    func() {
-      return true;
-    },
-  },
-]);
-const values = ref([]);
-const options = ref({
-  multi: true,
-  groups: true,
-  labelName: 'label',
-  labelList: 'elements',
-  groupName: 'title',
-  // cssSelected: (option) => (option.selected ? {'background-color': '#5764c6'} : ''),
-});
+// const filters = ref([
+//   {
+//     nameAll: 'Select all',
+//     nameNotAll: 'Deselect all',
+//     func() {
+//       return true;
+//     },
+//   },
+// ]);
+// const values = ref([]);
+// const options = ref({
+//   multi: true,
+//   // cssSelected: (option) => (option.selected ? {'background-color': '#5764c6'} : ''),
+// });
 
 
 </script>
-<script>
-import vueMultiSelect from 'vue-multi-select';
-import 'vue-multi-select/dist/lib/vue-multi-select.css';
+<!--<script>-->
+<!--import vueMultiSelect from 'vue-multi-select';-->
+<!--import 'vue-multi-select/dist/lib/vue-multi-select.css';-->
 
-export default {
-  components: {
-    vueMultiSelect,
-  },
-};
-</script>
+<!--export default {-->
+<!--  components: {-->
+<!--    vueMultiSelect,-->
+<!--  },-->
+<!--};-->
+<!--</script>-->
 
 <style scoped lang="scss">
 
@@ -137,6 +134,31 @@ select {
   background-color: var(--light);
   transition: filter 0.3s;
   border-radius: 6px;
+}
+
+button {
+  position: absolute;
+  margin-bottom: 20px;
+  bottom: 3rem;
+  border-radius: 15em;
+  background-color: white;
+  color: #2c3e50;
+  font-weight: bolder;
+
+}
+
+.groupMember {
+  background-color: hsl(210, 25%, 75%);
+  position: absolute;
+  right: 2rem;
+  top: 4rem;
+  width: 20rem;
+  height: 25rem;
+  overflow-y: auto;
+  color: #dddddd;
+  font-weight: bolder;
+  border-radius: 5px;
+  padding: 10px;
 }
 
 
