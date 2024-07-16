@@ -1,0 +1,21 @@
+<!--          <div class="dropdown-container">-->
+          <!--            <div class="selected-option" @click="toggleDropDown">{{ selectedGroupMem }}</div>-->
+          <!--            <div class="options-container" v-if="isOpen">-->
+          <!--              <div v-for="user in userStore.users" :key="user.username" @click="toggleUser(user.username)"-->
+          <!--                   :class="{'option': true , 'selected' : isUserSelected(user.username)}"-->
+          <!--                   role="button" tabindex="0" @keydown.enter="toggleUser(user.username)"-->
+          <!--                   @keydown.space="toggleUser(user.username)">-->
+          <!--                {{ user.username }}-->
+          <!--              </div>-->
+          <!--            </div>-->
+
+          <!--          </div>-->
+
+          <!--          <div>-->
+          <!--            <select class="custom-select" id="updateSelection" multiple>-->
+          <!--              <option style="color: #213547" v-for="user in userStore.users" :key="user.username">-->
+          <!--                {{ user.username }}-->
+          <!--              </option>-->
+          <!--            </select>-->
+          <!--          </div>-->
+          <!--          @change="updatedOptions" v-model="selectedUsers"-->

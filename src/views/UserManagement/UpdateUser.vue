@@ -99,7 +99,7 @@ const terms = ref(false)
 const handleSubmit = () => {
 }
 
-
+//fetching
 onMounted(() => {
   const userIdParam = route.query.id;
   const userId = Array.isArray(userIdParam) ? parseInt(userIdParam[0], 10) : parseInt(userIdParam, 10);

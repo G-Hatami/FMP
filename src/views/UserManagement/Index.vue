@@ -1,5 +1,7 @@
 <template>
-  <virtual-login></virtual-login>
+
+  <UsersTable></UsersTable>
+
   <div class="container">
     <div class="input-group">
       <label for="input2">{{ $t('Enter ID') }}:</label>
@@ -22,8 +24,8 @@
 
 <script setup>
 import {useRouter} from "vue-router";
-import virtualLogin from "../VirtualLogin.vue"
-import {useUserStore} from "../../stores/userStore";
+import UsersTable from "/src/views/MainTable/UsersTable.vue";
+import {useUserStore} from "/src/stores/userStore";
 import {ref} from "vue";
 
 

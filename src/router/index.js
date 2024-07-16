@@ -1,16 +1,19 @@
 import {createRouter, createWebHashHistory} from "vue-router";
 import Sidebar from "../components/Sidebar.vue";
-import FilesManagement from "../views/FilesManagement.vue";
+import FilesManagement from "../views/FilesManagement/FilesManagement.vue";
 import UsersManagement from "../views/UserManagement/Index.vue";
 import StorageSpace from "../views/StorageSpace.vue";
-import UserGroupManagement from "../views/UsersGroupManagement/UserGroupManagement.vue";
+import Groups from "../views/UsersGroupManagement/Groups.vue";
+import CreateUserGroup from "../views/UsersGroupManagement/CreateUserGroup.vue";
 import Settings from "../views/Settings.vue";
 import createUser from "../views/UserManagement/CreateUser.vue"
 import updateUser from "../views/UserManagement/UpdateUser.vue"
 import UsersTable from "../views/MainTable/UsersTable.vue";
 import VirtualLogin from "../views/VirtualLogin.vue";
+import Shared from "../views/FilesManagement/Shared.vue";
 
- const router = createRouter({
+
+const router = createRouter({
     history: createWebHashHistory(),
     routes: [
         {
@@ -22,36 +25,44 @@ import VirtualLogin from "../views/VirtualLogin.vue";
             component: FilesManagement
         },
         {
+            path: "/sharedFiles",
+            component: Shared
+        },
+        {
             path: "/indexPage",
             component: UsersManagement
         },
         {
-            path:"/storageSpace",
-            component:StorageSpace
+            path: "/storageSpace",
+            component: StorageSpace
         },
         {
-            path:"/userGroupManagement",
-            component: UserGroupManagement
+            path: "/groups",
+            component: Groups
         },
         {
-            path:"/settings" ,
-            component:Settings
+            path: "/createUserGroup",
+            component: CreateUserGroup
         },
         {
-            path:"/createUser",
-            component:createUser
+            path: "/settings",
+            component: Settings
         },
         {
-            path:"/updateUser",
-            component:updateUser
+            path: "/createUser",
+            component: createUser
         },
         {
-            path:"/usersTable",
-            component:UsersTable
+            path: "/updateUser",
+            component: updateUser
         },
         {
-            path:"/virtualLogin",
-            component:VirtualLogin
+            path: "/usersTable",
+            component: UsersTable
+        },
+        {
+            path: "/virtualLogin",
+            component: VirtualLogin
         }
 
     ]

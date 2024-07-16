@@ -1,5 +1,5 @@
 <template>
-  <h2>hello table</h2>
+
   <div class="table-container">
     <table id="recordTable">
       <thead>
@@ -13,7 +13,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="user in useStore.users" :key="user.id">
+      <tr v-for="user in userStore.users" :key="user.id">
         <td>{{ user.id }}</td>
         <td>{{ user.username }}</td>
         <td>{{ user.firstname }}</td>
@@ -26,25 +26,14 @@
   </div>
 </template>
 
-
 <script setup>
-import {useUserStore} from "../../stores/userStore";
-
-
-const useStore = useUserStore();
-
-
-
-
-
-
-
+import {useUserStore} from "/src/stores/userStore";
+const userStore = useUserStore()
 </script>
-
 
 <style scoped lang="scss">
 .table-container {
-  width: 1400px; /* Set the container width to 80% of the page */
+  width: 1400px;
   max-height: 70vh;
   overflow-y: auto;
   margin-bottom: 2rem;
@@ -58,7 +47,7 @@ const useStore = useUserStore();
 
 }
 
-/* Add your table styling here */
+
 table {
   position: relative;
   width: 100%;
@@ -109,3 +98,4 @@ ul {
   }
 }
 </style>
+

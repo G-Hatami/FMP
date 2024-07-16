@@ -15,7 +15,7 @@
         <span class="material-icons">person</span>
         <span class="text">Users Management</span>
       </router-link>
-      <router-link to="/userGroupManagement" class="button" exact>
+      <router-link to="/groups" class="button" exact>
         <span class="material-icons">group</span>
         <span class="text">UserGroup management</span>
       </router-link>
@@ -51,6 +51,7 @@ import {ref} from "vue";
 import i18n from "../i18n";
 
 const lang = ref(localStorage.getItem('lang') || 'en');
+
 function updateLang(newLang) {
   console.log(i18n)
   lang.value = newLang;
@@ -65,16 +66,12 @@ const data = {
 };
 
 
-
 // const is_expanded = ref(localStorage.getItem("is_expanded") === "true");
 const is_expanded = ref(false)
 const toggleMenu = () => {
   is_expanded.value = !is_expanded.value
   // localStorage.setItem("is_expanded", is_expanded.value.toString())
 }
-
-
-
 
 
 </script>
@@ -133,6 +130,7 @@ aside {
 
     .menu-toggle {
       transition: 0.2s ease-out;
+      outline: #213547;
 
 
       .material-icons {

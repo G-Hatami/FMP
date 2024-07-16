@@ -2,35 +2,29 @@
   <form>
     <div>
       <label>Name :</label>
-      <input type="text" maxlength="48" minlength="5">
+      <input v-model="groupName" type="text" maxlength="48" minlength="5">
+    </div>
+    <div>
+      <label>Users :</label>
     </div>
 
     <div>
-      <label>Users :</label>
-      <!--      <Multiselect-->
-      <!--          v-model="values"-->
-      <!--          search-->
-      <!--          historyButton-->
-      <!--          :filters="filters"-->
-      <!--          :options="options"-->
-      <!--          :selectOptions="users"/>-->
-    </div>
-    <div>
-      <select id="dynamicSelect" v-model="selected">
+      <select id="dynamicSelect" @change="updateSelection">
         <option v-for="user in users" :key="user.username" :value="user.username">
           {{ user.username }}
         </option>
       </select>
     </div>
-    <!--    <ul>-->
-    <!--      <li v-for="user in selected" :key="user.username">{{ user.name }}</li>-->
-    <!--    </ul>-->
+
     <button @click="createGroup">Create Group</button>
-    <!--    <label>Group Members:</label>-->
+
     <div class="groupMember">
-      <div v-for="select in selected">
-        {{ select }}
-      </div>
+      <label style="color: white; font-weight:bolder ; font-size: 20px">Group Members:</label>
+      <ul>
+        <li v-for="select in selectedOptions" :key="select">
+          {{ select }}
+        </li>
+      </ul>
     </div>
   </form>
 
@@ -39,56 +33,46 @@
 
 
 <script setup>
-import 'vue-multi-select/dist/lib/vue-multi-select.css';
-// import Multiselect from 'vue-multiselect'
 import {useUserStore} from "../../stores/userStore";
 import {onMounted, ref} from "vue";
-// import {DropDownListComponent as EjsDropdownlist} from "@syncfusion/ej2-vue-dropdowns";
 
 
 const userStore = useUserStore()
+const groupName = ref()
+const groupMembers = ref([])
 const users = ref([])
-const selected = ref([])
-const groups = ref([])
+const selectedOptions = ref([])
 
+//now U sure the component is fully connected to the DOM and u can dynamically fetch data
+//This guarantees that the select dropdown will be populated with options.
 onMounted(() => {
   users.value = userStore.users
 })
+//whenever I use any type of events (change , click , etc.) an event obj will occur
+const updateSelection = (event) => {
+  //selectedOptions are located in an HTML-collection (every selected option in select tag included)
+  // if we do noy use map, we will have access to the objects of options, but we only need the value
+  const selected = Array.from(event.target.selectedOptions).map(option => option.value);
+  //set is used to insure we take only unique data
+  selectedOptions.value = [...new Set([...selectedOptions.value, ...selected])];
+};
 const createGroup = () => {
-  if (selected.value.length > 0) {
-    groups.value.push(...selected.value)
-    selected.value = []
+  if (selectedOptions.value.length > 0) {
+    groupMembers.value.push(...selectedOptions.value)
+
+    const newGroup = {
+      groupName: groupName.value,
+      users: groupMembers.value
+    };
+    userStore.addGroup(newGroup)
+    selectedOptions.value = []
   } else {
     alert("please select at least one user to create a group")
   }
 }
-// const filters = ref([
-//   {
-//     nameAll: 'Select all',
-//     nameNotAll: 'Deselect all',
-//     func() {
-//       return true;
-//     },
-//   },
-// ]);
-// const values = ref([]);
-// const options = ref({
-//   multi: true,
-//   // cssSelected: (option) => (option.selected ? {'background-color': '#5764c6'} : ''),
-// });
 
 
 </script>
-<!--<script>-->
-<!--import vueMultiSelect from 'vue-multi-select';-->
-<!--import 'vue-multi-select/dist/lib/vue-multi-select.css';-->
-
-<!--export default {-->
-<!--  components: {-->
-<!--    vueMultiSelect,-->
-<!--  },-->
-<!--};-->
-<!--</script>-->
 
 <style scoped lang="scss">
 
@@ -123,6 +107,9 @@ form label {
 
 form input {
   margin-bottom: 7px;
+  background-color: var(--light);
+  color: var(--dark-alt);
+
 }
 
 select {
@@ -155,11 +142,16 @@ button {
   width: 20rem;
   height: 25rem;
   overflow-y: auto;
-  color: #dddddd;
   font-weight: bolder;
   border-radius: 5px;
   padding: 10px;
 }
 
+.groupMember ul {
+  color: whitesmoke;
+  position: relative;
+  top: 1rem;
+  //list-style-type: decimal;
+}
 
 </style>

@@ -1,6 +1,5 @@
 <template>
 
-
   <div class="table-container">
     <table id="recordTable">
       <thead>
@@ -34,23 +33,8 @@ const userStore = useUserStore()
 </script>
 
 <style scoped lang="scss">
-//h3 {
-//  position: fixed;
-//  color: #2c3e50;
-//  top: 3.5rem;
-//  left: 18.5rem;
-//  display: flex;
-//}
-//
-//.table-container {
-//  top: 5rem;
-//  right: 12rem;
-//}
-
-
-
- .table-container {
-  width: 1400px; /* Set the container width to 80% of the page */
+.table-container {
+  width: 1400px;
   max-height: 70vh;
   overflow-y: auto;
   margin-bottom: 2rem;
@@ -64,7 +48,7 @@ const userStore = useUserStore()
 
 }
 
-/* Add your table styling here */
+
 table {
   position: relative;
   width: 100%;

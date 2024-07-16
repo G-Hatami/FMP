@@ -18,6 +18,7 @@
   "Create the User": "ساخت کاربر",
   "Accept terms and conditions": "پذیرفتن قوانین و شرایط",
   "Type": "نقش",
+  "Create Group": "ایجاد گروه",
   "To delete a user with each type , just enter the id and push the delete button!": "برای حذف یک کاربر با هر نقشی کافی است  شناسه را وارد کرده و دکمه حذف را بزنید",
   "To update a user information with any type , just enter the id and push the update button!": "برای ویرایش یک کاربر با هر نقشی کافی است  شناسه را وارد کرده و دکمه ویرایش را بزنید",
   "To create a new user with any type , just push the create button!": "برای ساخت کاربر جدید کافی است دکمه ساخت را بزنید"

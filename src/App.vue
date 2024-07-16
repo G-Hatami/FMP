@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <sidebar />
+    <sidebar/>
     <router-view/>
 
   </div>
@@ -18,6 +18,7 @@ import sidebar from "./components/Sidebar.vue"
   --dark: #1e293b;
   --light: #f1f5f9;
   --sidebar-width: 300px;
+  --dialog-background: #1c2841;
   --hue: 210; /* Set the base hue value (blue-green) */
   --saturation: 100%; /* Set the saturation to 100% for full color */
   --lightness: 10%; /* Adjust the lightness for lighter shades */
@@ -25,7 +26,7 @@ import sidebar from "./components/Sidebar.vue"
 }
 
 body {
-  background: var(--light);
+  background: var(--dark-alt);
 }
 
 * {
@@ -46,6 +47,7 @@ button {
 .app {
   position: relative;
   display: flex;
+
   main {
 
     padding: 2rem;
@@ -55,6 +57,7 @@ button {
     }
   }
 }
+
 .sidebar {
   width: 250px;
   position: fixed;

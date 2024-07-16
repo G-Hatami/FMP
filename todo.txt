@@ -1,0 +1,7 @@
+MUST BE SEARCHED:
+    -how pinia works
+    -local storage usage
+    -life cycles
+    -should I add any first obj in group array? how can I add a group with a specic name and users to a store
+    -DOM
+    -watch and computed and

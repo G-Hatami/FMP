@@ -1,0 +1,43 @@
+ <!--            <button @click="showUpdateModal(userGroup)" class="btn"><i class="fa fa-pen"></i></button>-->
+            <!--        <dialog @click="showDeleteModal(userGroup.users)" class="dialog"><i class="fa fa-trash"></i></dialog>-->
+            <!--        <dialog @click="showUpdateModal(userGroup.users)" class="dialog"><i class="fa fa-pen"></i></dialog>-->
+
+
+
+
+            const handleClickOutside = (event) => {
+              if (deleteDialog.value && !deleteDialog.value.contains(event.target)) {
+                closeDialog()
+              }
+
+            }
+
+            const showDeleteModal = (userGroup) => {
+              selectedGroup.value = userGroup;
+              document.getElementById("deleteDialog").showModal()
+              // deleteDialog.value.showModal();
+              document.addEventListener('click', handleClickOutside);
+            }
+            const closeDialog = () => {
+              selectedGroup.value = null;
+              document.getElementById("deleteDialog").close()
+              document.removeEventListener('click', handleClickOutside);
+
+            }
+            const deleteGroup = () => {
+              if (selectedGroup.value) {
+                userStore.deleteGroup(selectedGroup.value);
+                closeDialog();
+              }
+            }
+
+
+
+
+
+
+
+            <!--    <input type="file" style="display: none" id="upload" multiple @change="handleUploadFile">-->
+            <!--    <button id="upload-button" onclick="document.getElementById('upload').click()"><i-->
+            <!--        class="fa-solid fa-cloud-arrow-up"></i><br> upload file-->
+            <!--    </button>-->
