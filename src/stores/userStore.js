@@ -21,7 +21,7 @@ export const useUserStore = defineStore('userStore', {
                 usergroup: "Admins"
             },
             {
-                id: 1,
+                id: 3,
                 username: "G.Hatami2005",
                 firstname: "Goli",
                 lastname: "Hatami",
@@ -29,7 +29,7 @@ export const useUserStore = defineStore('userStore', {
                 usergroup: "Admins"
             },
             {
-                id: 1,
+                id: 4,
                 username: "G.Hatami2006",
                 firstname: "Goli",
                 lastname: "Hatami",
@@ -70,9 +70,14 @@ export const useUserStore = defineStore('userStore', {
                 this.groups.push(newGroup)
             }
         },
-        updateGroup(newGroup , selectedGroup) {
-
-
+        updateGroup(newGroup, selectedGroup) {
+            const index = this.groups.findIndex(obj => obj.name === selectedGroup.groupName1)
+            if (index !== -1) {
+                this.groups.splice(index, 1, newGroup)
+            } else {
+                // Handle case where selectedGroup is not found in the array
+                console.log(`Group '${selectedGroup.name}' not found in the array.`);
+            }
         },
         deleteGroup(selectedGroup) {
             this.groups = this.groups.filter(group => group.groupName !== selectedGroup.groupName)

@@ -15,9 +15,9 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="userGroup in userStore.groups" :key="userGroup.id">
+        <tr v-for="userGroup in userStore.groups" :key="userGroup.groupName">
           <td>{{ userGroup.groupName }}</td>
-          <td>{{ userGroup.users }}</td>
+          <td>{{ userGroup.users.join(" ,") }}</td>
           <td>
             <button @click="showDeleteModal(userGroup)" class="btn"><i class="fa fa-trash"></i></button>
             <button @click="showUpdateModal(userGroup)" class="btn"><i class="fa-sharp fa-solid fa-pen"></i></button>
@@ -64,27 +64,31 @@
 <script setup>
 import '@fortawesome/fontawesome-free/css/all.css';
 import {useUserStore} from "/src/stores/userStore";
-import {ref} from "vue";
+import {reactive, ref} from "vue";
 // import doc from "vue-multi-select/src/components/doc/doc";
 
 const userStore = useUserStore()
-const selectedGroup = ref(null)
-const selectedGroupName = ref(null)
-const updatedGroupName = ref(selectedGroupName)
-const selectedGroupMem = []
+const selectedGroup = reactive({})
+// const selectedGroupName = ref(null)
+const updatedGroupName = ref()
+const updatedGroupMem = ref([])
 const isOpen = ref(false)
 
 
 const showDeleteModal = (userGroup) => {
-  selectedGroup.value = {...userGroup};
+  Object.assign(selectedGroup, userGroup)
   document.getElementById("deleteDialog").showModal()
 }
 const showUpdateModal = (userGroup) => {
-  selectedGroup.value = {...userGroup};
-  selectedGroupMem.value = userGroup.users
-  selectedGroupName.value = userGroup.groupName;
+  Object.assign(selectedGroup, userGroup)
+  // selectedGroupMem.value = userGroup.users
+  // selectedGroupName.value = userGroup.groupName;
+  updatedGroupName.value = userGroup.groupName
+  updatedGroupMem.value = userGroup.users
   console.log("Selected Group for Update:", selectedGroup.value);
-  console.log("Selected name for Update:", selectedGroupName.value);
+  console.log("Selected name for Update:", selectedGroup.groupName);
+  console.log("Selected members for Update:", selectedGroup.users);
+
   document.getElementById("updateDialog").showModal()
 }
 const closeDeleteDialog = () => {
@@ -111,49 +115,35 @@ const handleSelectChange = (event) => {
 }
 
 const toggleUser = (username) => {
-  const index = selectedGroupMem.value.indexOf(username)
+  const index = updatedGroupMem.value.indexOf(username)
   if (index === -1) {//it does not exist
-    selectedGroupMem.value.push(username)
+    updatedGroupMem.value.push(username)
     console.log("not found")
   } else {
     console.log("not dvffound")
-    selectedGroupMem.value.splice(index, 1)
+    updatedGroupMem.value.splice(index, 1)
   }
 
 }
 const isUserSelected = (username) => {
-  return selectedGroupMem.value.includes(username)
+  return selectedGroup.users.includes(username)
 }
 
-// const updatedOptions = () => {
-//   if (!selectedGroupMem.includes(selectedUsers)) {
-//     selectedGroupMem.push(selectedUsers)
-//     console.log(selectedGroupMem)
-//   }
-// }
-// const updateGroup = () => {
-//   if (selectedGroup.value)
-//     userStore.groups.groupName = selectedGroupName.value
-//   closeUpdateDialog()
-// };
-// const updateGroupName = (event)=> {
-//   userStore.groups.groupName = event.target.value
-// }
-
 const update = () => {
-  if (updatedGroupName.value && selectedGroupMem.value) {
-    const updatedGroup = {
-      groupName: updatedGroupName.value,
-      // users: selectedGroupMem.value
-    };
-    const selectedGroup = {
-      groupName1: selectedGroupName.value,
-      // users: selectedGroupMem.value
-    }
-    console.log("selected was" ,selectedGroup.groupName1)
-    console.log("updated is" ,updatedGroup)
-    // userStore.updateGroup(updatedGroup, selectedGroup)
+
+  const lastSelectedGroup = {
+    groupName1: selectedGroup.groupName,
+    users: selectedGroup.users
   }
+  const updatedGroup = {
+    groupName: updatedGroupName.value,
+    users: updatedGroupMem
+  };
+
+  console.log("selected was", selectedGroup)
+  console.log("updated is", updatedGroup)
+  userStore.updateGroup(updatedGroup, lastSelectedGroup)
+
   closeUpdateDialog()
   console.log("helllo")
 }
@@ -188,7 +178,7 @@ h1 {
   position: fixed;
   top: 4rem;
   left: 15rem;
-  color: #213547;
+  color: #dddddd;
 
 }
 

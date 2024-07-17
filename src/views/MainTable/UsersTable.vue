@@ -14,7 +14,7 @@
       </thead>
       <tbody>
       <tr v-for="user in userStore.users" :key="user.id">
-        <td>{{ user.id }}</td>
+        <td style="background-color: rgba(34, 197, 94, 0.4)">{{ user.id }}</td>
         <td>{{ user.username }}</td>
         <td>{{ user.firstname }}</td>
         <td>{{ user.lastname }}</td>
@@ -28,6 +28,7 @@
 
 <script setup>
 import {useUserStore} from "/src/stores/userStore";
+
 const userStore = useUserStore()
 </script>
 
@@ -52,20 +53,22 @@ table {
   position: relative;
   width: 100%;
   border-collapse: collapse;
+  //border-style: solid;
+  border: #D3D3D3 solid 1px;
 }
 
 thead th {
-  background-color: black;
+  background-color: rgba(34, 197, 94, 0.4);
   border-bottom: 1px solid #ddd;
 }
 
-tbody tr:nth-child(even) {
-  background-color: var(--dark)
+tbody tr {
+  background-color: var(--dark);
 }
 
-tbody tr:nth-child(odd) {
-  background-color: hsl(var(--hue), var(--saturation), calc(45% + var(--darkness)));
-}
+//tbody tr:nth-child(odd) {
+//  background-color: hsl(var(--hue), var(--saturation), calc(45% + var(--darkness)));
+//}
 
 
 td, th {

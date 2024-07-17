@@ -50,6 +50,7 @@ onMounted(() => {
 })
 //whenever I use any type of events (change , click , etc.) an event obj will occur
 const updateSelection = (event) => {
+
   //selectedOptions are located in an HTML-collection (every selected option in select tag included)
   // if we do noy use map, we will have access to the objects of options, but we only need the value
   const selected = Array.from(event.target.selectedOptions).map(option => option.value);
@@ -57,6 +58,7 @@ const updateSelection = (event) => {
   selectedOptions.value = [...new Set([...selectedOptions.value, ...selected])];
 };
 const createGroup = () => {
+  console.log(selectedOptions.value)
   if (selectedOptions.value.length > 0) {
     groupMembers.value.push(...selectedOptions.value)
 
@@ -65,10 +67,14 @@ const createGroup = () => {
       users: groupMembers.value
     };
     userStore.addGroup(newGroup)
+    console.log(userStore.groups.length)
     selectedOptions.value = []
+    groupMembers.value =  []
+
   } else {
     alert("please select at least one user to create a group")
   }
+
 }
 
 
