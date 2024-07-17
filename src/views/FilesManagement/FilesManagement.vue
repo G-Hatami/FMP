@@ -7,7 +7,7 @@
         <button @click="showShareDialog" style="color: #1e293b "><i class="fa-solid fa-share-from-square"></i>Share
         </button>
         <button @click="showCopyDialog" style="color: #1e293b "><i class="fa-solid fa-copy"></i>Copy</button>
-        <button style="color: #1e293b "><i class="fa-solid fa-download"></i>Download</button>
+        <button @click="deleteFile" style="color: #1e293b "><i class="fa-solid fa-download"></i>Download</button>
         <button @click="showMoveDialog" style="color: #1e293b "><i class="fa-solid fa-arrow-right"></i>Move
         </button>
         <button @click="closeFeatures" id="cancel-selection"><i class="fa-solid fa-xmark"></i> {{ selectedFiles.size }}
@@ -212,7 +212,19 @@ const closeFeatures = () => {
   selectedFiles.value.clear()
   showOptions.value = false
 }
-
+const deleteFile = () => {
+  for (let i = 1; i <= selectedFiles.value.size; i++) {
+    const blob = new Blob([""], {type: "text/plain"});
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = `empty_file_${i}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }}
 
 </script>
 
