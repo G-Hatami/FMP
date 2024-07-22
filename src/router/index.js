@@ -10,7 +10,6 @@ import createUser from "../views/UserManagement/CreateUser.vue"
 import updateUser from "../views/UserManagement/UpdateUser.vue"
 import UsersTable from "../views/MainTable/UsersTable.vue";
 import VirtualLogin from "../views/VirtualLogin.vue";
-import Shared from "../views/FilesManagement/Shared.vue";
 
 
 const router = createRouter({
@@ -24,10 +23,7 @@ const router = createRouter({
             path: "/filesManagement",
             component: FilesManagement
         },
-        {
-            path: "/sharedFiles",
-            component: Shared
-        },
+
         {
             path: "/indexPage",
             component: UsersManagement

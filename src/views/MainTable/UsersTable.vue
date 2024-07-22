@@ -4,7 +4,7 @@
     <table id="recordTable">
       <thead>
       <tr>
-        <th>ID</th>
+
         <th>Username</th>
         <th>Firstname</th>
         <th>Lastname</th>
@@ -13,8 +13,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="user in userStore.users" :key="user.id">
-        <td style="background-color: rgba(34, 197, 94, 0.4)">{{ user.id }}</td>
+      <tr v-for="user in userStore.users">
         <td>{{ user.username }}</td>
         <td>{{ user.firstname }}</td>
         <td>{{ user.lastname }}</td>
@@ -45,6 +44,7 @@ const userStore = useUserStore()
   display: flex;
   justify-content: center;
   padding-left: 23%;
+  color: #dddddd;
 
 }
 
@@ -53,7 +53,6 @@ table {
   position: relative;
   width: 100%;
   border-collapse: collapse;
-  //border-style: solid;
   border: #D3D3D3 solid 1px;
 }
 
@@ -66,9 +65,6 @@ tbody tr {
   background-color: var(--dark);
 }
 
-//tbody tr:nth-child(odd) {
-//  background-color: hsl(var(--hue), var(--saturation), calc(45% + var(--darkness)));
-//}
 
 
 td, th {

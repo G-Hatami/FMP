@@ -29,21 +29,19 @@
       <dialog id="deleteDialog" class="deleteDialog" v-if="selectedGroup">
         <h2>Delete<em> User</em></h2>
         <p>Are you sure you want to delete {{ selectedGroup.groupName }}?</p>
-        <button class="yesBtn" @click="deleteGroup()">Yes</button>
+        <button class="yesBtn" @click="deleteGroup11">Yes</button>
         <button class="noBtn" @click="closeDeleteDialog">No</button>
       </dialog>
 
 
       <dialog id="updateDialog" class="updateDialog" v-if="selectedGroup">
-        <form @submit.prevent="">
+        <form @submit.prevent="update">
           <h2>Update Group</h2>
           <label for="groupName"> group name :</label><br>
-          <input type="text" maxlength="48" minlength="5" v-model="updatedGroupName">
+          <input type="text" maxlength="48" minlength="5" v-model="tempGroupName">
           <label for="groupName"> group members :</label><br>
-
-          <select class="selected-option" @click="toggleDropDown" @change="handleSelectChange">
-            <option v-if="isOpen" v-for="user in userStore.users" :key="user.username"
-                    @click="toggleUser(user.username)"
+          <select multiple class="selected-option" @click="toggleDropDown" @change="handleSelectChange">
+            <option v-if="isOpen" v-for="user in usernames" :key="user.username"
                     :class="{'option': true , 'selected' : isUserSelected(user.username)}"
                     tabindex="0" @keydown.enter="toggleUser(user.username)"
                     @keydown.space="toggleUser(user.username)">
@@ -53,7 +51,7 @@
         </form>
         <div class="updButtons">
           <button class="updBtn" @click="update">Update</button>
-          <button class="cancelBtn" @click="closeDeleteDialog">Cancel</button>
+          <button class="cancelBtn" @click="closeUpdateDialog">Cancel</button>
         </div>
       </dialog>
 
@@ -65,13 +63,13 @@
 import '@fortawesome/fontawesome-free/css/all.css';
 import {useUserStore} from "/src/stores/userStore";
 import {reactive, ref} from "vue";
-// import doc from "vue-multi-select/src/components/doc/doc";
+
 
 const userStore = useUserStore()
 const selectedGroup = reactive({})
-// const selectedGroupName = ref(null)
-const updatedGroupName = ref()
-const updatedGroupMem = ref([])
+const usernames = userStore.users
+const tempGroupName = ref("")
+const tempGroupMem = []
 const isOpen = ref(false)
 
 
@@ -79,32 +77,32 @@ const showDeleteModal = (userGroup) => {
   Object.assign(selectedGroup, userGroup)
   document.getElementById("deleteDialog").showModal()
 }
-const showUpdateModal = (userGroup) => {
-  Object.assign(selectedGroup, userGroup)
-  // selectedGroupMem.value = userGroup.users
-  // selectedGroupName.value = userGroup.groupName;
-  updatedGroupName.value = userGroup.groupName
-  updatedGroupMem.value = userGroup.users
-  console.log("Selected Group for Update:", selectedGroup.value);
-  console.log("Selected name for Update:", selectedGroup.groupName);
-  console.log("Selected members for Update:", selectedGroup.users);
-
-  document.getElementById("updateDialog").showModal()
-}
 const closeDeleteDialog = () => {
-  selectedGroup.value = null;
+  selectedGroup.value = null
   document.getElementById("deleteDialog").close()
 
 }
-const closeUpdateDialog = () => {
-  document.getElementById("updateDialog").close()
+const showUpdateModal = (userGroup) => {
+  // Object.assign(selectedGroup, userGroup)
+  selectedGroup.value = {...userGroup}
+  tempGroupName.value = userGroup.groupName
+  tempGroupMem.value = [...userGroup.users]
+  document.getElementById("updateDialog").showModal()
 }
 
-const deleteGroup = () => {
-  if (selectedGroup.value) {
-    userStore.deleteGroup(selectedGroup.value);
-    closeDeleteDialog();
+const closeUpdateDialog = () => {
+  document.getElementById("updateDialog").close()
+  selectedGroup.value = null
+  tempGroupName.value = ""
+  tempGroupMem.value = []
+}
+
+const deleteGroup11 = () => {
+  if (selectedGroup) {
+    userStore.deleteGroup(selectedGroup.groupName);
+    // console.log(selectedGroup.groupName)
   }
+  closeDeleteDialog();
 }
 const toggleDropDown = () => {
   isOpen.value = !isOpen.value
@@ -115,39 +113,40 @@ const handleSelectChange = (event) => {
 }
 
 const toggleUser = (username) => {
-  const index = updatedGroupMem.value.indexOf(username)
-  if (index === -1) {//it does not exist
-    updatedGroupMem.value.push(username)
-    console.log("not found")
+  const index = tempGroupMem.value.indexOf(username)
+  if (index === -1) {//it does not exist (represent the element which was not blue)
+    tempGroupMem.value.push(username)
   } else {
-    console.log("not dvffound")
-    updatedGroupMem.value.splice(index, 1)
+//represent blue ones
+    tempGroupMem.value.splice(index, 1)
   }
 
 }
 const isUserSelected = (username) => {
-  return selectedGroup.users.includes(username)
+  return tempGroupMem.value.includes(username)
+
 }
+
 
 const update = () => {
+  if (tempGroupName.value.trim().length <= 48 && tempGroupName.value.trim().length >= 5){
 
-  const lastSelectedGroup = {
-    groupName1: selectedGroup.groupName,
-    users: selectedGroup.users
+    const updatedGroup = {
+      groupName: tempGroupName.value,
+      users: tempGroupMem.value
+    };
+    const selectedName = selectedGroup.value.groupName
+    console.log(selectedName)
+    userStore.updateGroup(updatedGroup, selectedName)
+
+    closeUpdateDialog()
+    console.log("helllo")
   }
-  const updatedGroup = {
-    groupName: updatedGroupName.value,
-    users: updatedGroupMem
-  };
+  else {
+    alert("The name should contains at least 5 char!")
+  }
 
-  console.log("selected was", selectedGroup)
-  console.log("updated is", updatedGroup)
-  userStore.updateGroup(updatedGroup, lastSelectedGroup)
-
-  closeUpdateDialog()
-  console.log("helllo")
 }
-
 </script>
 
 <style scoped lang="scss">
@@ -315,6 +314,10 @@ select, input[type="text"] {
   color: #213547;
   font-size: 14px;
   font-weight: bold;
+}
+
+select {
+  height: 50px;
 }
 
 //.selection{

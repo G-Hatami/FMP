@@ -1,8 +1,8 @@
 <template>
-  <form>
+  <form @submit.prevent>
     <div>
       <label>Name :</label>
-      <input v-model="groupName" type="text" maxlength="48" minlength="5">
+      <input v-model="groupName" type="text" maxlength="48" minlength="5" required>
     </div>
     <div>
       <label>Users :</label>
@@ -10,6 +10,7 @@
 
     <div>
       <select id="dynamicSelect" @change="updateSelection">
+        <option value="" disabled selected>Select a user</option>
         <option v-for="user in users" :key="user.username" :value="user.username">
           {{ user.username }}
         </option>
@@ -21,8 +22,9 @@
     <div class="groupMember">
       <label style="color: white; font-weight:bolder ; font-size: 20px">Group Members:</label>
       <ul>
-        <li v-for="select in selectedOptions" :key="select">
+        <li v-for="(select , index ) in selectedOptions" :key="index">
           {{ select }}
+          <i role="button" @click="removeFromSelection(index)" class="fa-solid fa-xmark"></i>
         </li>
       </ul>
     </div>
@@ -59,7 +61,7 @@ const updateSelection = (event) => {
 };
 const createGroup = () => {
   console.log(selectedOptions.value)
-  if (selectedOptions.value.length > 0) {
+  if (selectedOptions.value.length > 0 && groupName.value.trim() !== "") {
     groupMembers.value.push(...selectedOptions.value)
 
     const newGroup = {
@@ -67,14 +69,20 @@ const createGroup = () => {
       users: groupMembers.value
     };
     userStore.addGroup(newGroup)
+    window.history.back()
     console.log(userStore.groups.length)
     selectedOptions.value = []
-    groupMembers.value =  []
+    groupMembers.value = []
 
   } else {
-    alert("please select at least one user to create a group")
+    alert("please select at least one user to create a group and check the name ")
   }
 
+}
+const removeFromSelection = (index) => {
+  console.log(index)
+  selectedOptions.value.splice(index, 1)
+  console.log(selectedOptions)
 }
 
 

@@ -5,39 +5,25 @@ export const useUserStore = defineStore('userStore', {
     state: () => ({
         users: [
             {
-                id: 1,
-                username: "G.Hatami2004",
+                username: "Admin",
                 firstname: "Goli",
                 lastname: "Hatami",
                 type: "Admin",
-                usergroup: "Admins"
-            },
-            {
-                id: 2,
-                username: "G.Hatami2003",
-                firstname: "Goli",
-                lastname: "Hatami",
-                type: "Admin",
-                usergroup: "Admins"
-            },
-            {
-                id: 3,
-                username: "G.Hatami2005",
-                firstname: "Goli",
-                lastname: "Hatami",
-                type: "Admin",
-                usergroup: "Admins"
-            },
-            {
-                id: 4,
-                username: "G.Hatami2006",
-                firstname: "Goli",
-                lastname: "Hatami",
-                type: "Admin",
-                usergroup: "Admins"
+                usergroup: "",
+                theme: "",
+                lang: ""
             }
         ],
         groups: [],
+        loggedInUser : {
+            username: "Admin",
+            firstname: "Goli",
+            lastname: "Hatami",
+            type: "Admin",
+            usergroup: "",
+            theme: "",
+            lang: ""
+        },
         name: "pinia",
 
     }),
@@ -45,24 +31,23 @@ export const useUserStore = defineStore('userStore', {
         //to create a new user and specify a new id
         addUser(newUser) {
             if (!this.users.find(user => user.username === newUser.username)) {
-                newUser.id = this.users.length + 1
                 this.users.push(newUser);
             }
 
         },
-        findId(id) {
-            return this.users.find(user => user.id === id);
+        findUser(userName) {
+            return this.users.find(user => user.username === userName);
         },
         //to delete a user
-        deleteUser(id) {
-            this.users = this.users.filter(user => user.id !== id);
+        deleteUser(userName) {
+            this.users = this.users.filter(user => user.username !== userName);
         },
         //to return the user with the specific id
         // I want to delete the user with specific id and replace it with the updated one
-        updateUser(user) {
-            const index = this.users.findIndex(u => u.id === user.id);
+        updateUser(newUser, defaultUser) {
+            const index = this.users.findIndex(u => u.username === defaultUser);
             if (index !== -1) {
-                this.users.splice(index, 1, user);
+                this.users.splice(index, 1, newUser);
             }
         },
         addGroup(newGroup) {
@@ -70,17 +55,17 @@ export const useUserStore = defineStore('userStore', {
                 this.groups.push(newGroup)
             }
         },
-        updateGroup(newGroup, selectedGroup) {
-            const index = this.groups.findIndex(obj => obj.name === selectedGroup.groupName1)
+        updateGroup(newGroup, selectedName) {
+            const index = this.groups.findIndex(obj => obj.groupName === selectedName)
             if (index !== -1) {
-                this.groups.splice(index, 1, newGroup)
+                this.groups[index] = newGroup
             } else {
                 // Handle case where selectedGroup is not found in the array
-                console.log(`Group '${selectedGroup.name}' not found in the array.`);
+                console.log(`Group '${selectedName}' not found in the array.`);
             }
         },
-        deleteGroup(selectedGroup) {
-            this.groups = this.groups.filter(group => group.groupName !== selectedGroup.groupName)
+        deleteGroup(groupName) {
+            this.groups = this.groups.filter(group => group.groupName !== groupName)
         },
         getters: {}
 

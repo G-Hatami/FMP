@@ -1,5 +1,5 @@
 <template>
-   <form @submit.prevent="handleSubmit">
+  <form @submit.prevent="handleSubmit">
     <label>{{ $t('User name') }}:</label>
     <input type="text" maxlength="48" minlength="5" required v-model="username" onblur="disabled=true">
 
@@ -115,6 +115,7 @@ const createUser = () => {
   };
 
   userStore.addUser(newUser)
+  window.history.back()
 }
 
 

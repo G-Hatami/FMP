@@ -22,11 +22,11 @@
         <button id="upload-button" onclick="document.getElementById('upload').click()"><i
             class="fa-solid fa-cloud-arrow-up"></i><br> upload file
         </button>
-        <router-link to="/sharedFiles">
-          <button id="shared-button"><i class="fa-solid fa-share-nodes"></i><br>
-            share
-          </button>
-        </router-link>
+
+        <button id="shared-button"><i class="fa-solid fa-share-nodes"></i><br>
+          share
+        </button>
+
       </div>
 
       <h1 style="color: #f1f1f1">All Files</h1>
@@ -224,7 +224,8 @@ const deleteFile = () => {
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
-  }}
+  }
+}
 
 </script>
 

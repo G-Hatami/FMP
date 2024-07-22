@@ -50,8 +50,10 @@
 import {ref} from "vue";
 import i18n from "../i18n";
 
-const lang = ref(localStorage.getItem('lang') || 'en');
 
+const lang = ref(localStorage.getItem('lang') || 'en');
+const time = ref(null)
+const interval = ref(null)
 function updateLang(newLang) {
   console.log(i18n)
   lang.value = newLang;
@@ -64,6 +66,7 @@ const data = {
   lang,
   updateLang
 };
+
 
 
 // const is_expanded = ref(localStorage.getItem("is_expanded") === "true");
@@ -97,7 +100,7 @@ aside {
 
   #settings {
     position: absolute;
-    bottom: 2rem;
+    bottom: 2.6rem;
     width: 99%;
 
     .material-icons {
@@ -108,7 +111,6 @@ aside {
     button {
       width: 100%;
     }
-
 
   }
 

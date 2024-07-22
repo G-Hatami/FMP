@@ -5,6 +5,7 @@
   "DELETE": "DELETE",
   "UPDATE": "UPDATE",
   "Enter ID": "Enter ID",
+  "Enter username" : "Enter username",
   "User name": "User name",
   "First name": "First name",
   "Last name": "Last name",

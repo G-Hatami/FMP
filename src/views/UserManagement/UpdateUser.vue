@@ -88,7 +88,7 @@ const userInfo = ref({
   username: '',
   firstname: '',
   lastname: '',
-  usergroup: '',
+  userGroup: '',
   type: '',
   creator: '',
   creationTime: '',
@@ -101,31 +101,32 @@ const handleSubmit = () => {
 
 //fetching
 onMounted(() => {
-  const userIdParam = route.query.id;
-  const userId = Array.isArray(userIdParam) ? parseInt(userIdParam[0], 10) : parseInt(userIdParam, 10);
-  if (!isNaN(userId)) {
-    const foundUser = userStore.findId(userId);
-    if (foundUser) {
-      userInfo.value.id = foundUser.id;
-      userInfo.value.username = foundUser.username;
-      userInfo.value.firstname = foundUser.firstname;
-      userInfo.value.lastname = foundUser.lastname;
-      userInfo.value.usergroup = foundUser.usergroup;
-      userInfo.value.type = foundUser.type;
+      userInfo.value.username = route.query.username
+      const foundUser = userStore.findUser(userInfo.value.username);
+      console.log(foundUser)
+      if (foundUser) {
+        userInfo.value.id = foundUser.id;
+        userInfo.value.username = foundUser.username;
+        userInfo.value.firstname = foundUser.firstname;
+        userInfo.value.lastname = foundUser.lastname;
+        userInfo.value.usergroup = foundUser.usergroup;
+        userInfo.value.type = foundUser.type;
+      }
     }
-  }
-});
+);
 
 const handleUpdates = () => {
+  const beforeUpdate = route.query.username
   const updatedUser = {
     id: userInfo.value.id,
     username: userInfo.value.username,
     firstname: userInfo.value.firstname,
     lastname: userInfo.value.lastname,
-    usergroup: userInfo.value.usergroup,
+    usergroup: userInfo.value.userGroup,
     type: userInfo.value.type
   }
-  userStore.updateUser(updatedUser)
+  userStore.updateUser(updatedUser , beforeUpdate)
+  window.history.back()
 }
 
 

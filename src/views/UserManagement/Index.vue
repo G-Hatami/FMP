@@ -4,8 +4,8 @@
 
   <div class="container">
     <div class="input-group">
-      <label for="input2">{{ $t('Enter ID') }}:</label>
-      <input type="number" id="input2" value=123.... v-model="chosenID">
+      <label  for="input2">{{ $t('Enter username') }}</label>
+      <input type="text" id="input2" v-model="chosenUser">
       <button class="deleteButton" @click="deleteUser">{{ $t('DELETE') }}</button>
     </div>
   </div>
@@ -27,20 +27,23 @@ import {useRouter} from "vue-router";
 import UsersTable from "/src/views/MainTable/UsersTable.vue";
 import {useUserStore} from "/src/stores/userStore";
 import {ref} from "vue";
+import query from "vue-resource/src/url/query";
 
 
 const userStore = useUserStore()
 
 const router = useRouter();
-const chosenID = ref('')
+const chosenUser = ref("")
 // Function to navigate to update user page
 const deleteUser = () => {
-  userStore.deleteUser(parseInt(chosenID.value, 10));
+  const chosen2 = chosenUser.value.trim()
+  userStore.deleteUser(chosen2);
+  chosenUser.value =""
 };
 const goToFindChosen = () => {
-  const userId = parseInt(chosenID.value, 10);
-  if (userStore.findId(userId)) {
-    router.push({path: '/updateUser', query: {id: userId.toString()}});
+  const chosen3 = chosenUser.value.trim()
+  if (userStore.findUser(chosen3)) {
+    router.push({path: '/updateUser', query: {username: chosen3}});
   }
 }
 
@@ -60,10 +63,10 @@ const goToFindChosen = () => {
 
     label {
       position: fixed;
-      top: 6rem;
-      right: 5.1rem;
+      top: 5.5rem;
+      right: 3rem;
       display: block;
-      color: #213547;
+      color: snow;
       font-size: 21px;
       font-weight: bolder;
     }
@@ -78,6 +81,7 @@ const goToFindChosen = () => {
       height: 2rem;
       font-weight: bold;
       font-size: 18px;
+      color: #dddddd;
     }
   }
 }
