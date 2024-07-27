@@ -11,62 +11,64 @@
     <h3>Menu</h3>
     <div class="menu">
 
-      <router-link to="/indexPage" class="button" exact>
+      <router-link :to="{ name : 'index'}" class="button" :class="{ disabled : isUserManagementDisabled}" exact>
         <span class="material-icons">person</span>
         <span class="text">Users Management</span>
       </router-link>
-      <router-link to="/groups" class="button" exact>
+      <router-link :to="{name : 'groups'}" class="button" :class="{disabled : isUserGroupManagementDisabled}" exact>
         <span class="material-icons">group</span>
         <span class="text">UserGroup management</span>
       </router-link>
-      <router-link to="/filesManagement" class="button" exact>
+      <router-link :to="{name : 'fileManagement' }" class="button" exact>
         <span class="material-icons">insert_drive_file</span>
         <span class="text">files management</span>
       </router-link>
-      <router-link to="/storageSpace" class="button" exact>
+      <router-link :to="{name : 'storage'}" class="button" :class="{disabled : isStorageDisabled}" exact>
         <span class="material-icons">storage</span>
         <span class="text">Storage space</span>
       </router-link>
-      <router-link to="/virtualLogin" class="button" exact>
+      <router-link :to="{name : 'virtualLogin'}" class="button" exact>
         <span class="material-icons">login</span>
         <span class="text">Login</span>
       </router-link>
-      <select class="custom-select" v-model="lang" @change="data.updateLang($event.target.value)">
-        <option value="EN">English</option>
-        <option value="FA">فارسی</option>
-        <option></option>
-      </select>
+
       <div class="settings">
         <router-link to="/settings" class="button" id="settings" exact>
           <span class="material-icons">settings</span>
           <span class="text">Settings</span>
         </router-link>
-
+      </div>
+      <div>
+        <p>{{ userStore.currentUser.username}}</p>
+        <p>{{ userStore.currentUser.type}}</p>
+        <p>{{ userStore.currentUser.theme}}</p>
+        <p>{{ userStore.currentUser.lang}}</p>
+<!--        <p>{{ userStore.currentUser.userUploadedFiles.length}}</p>-->
       </div>
     </div>
   </aside>
 </template>
 <script setup>
-import {ref} from "vue";
-import i18n from "../i18n";
+import {computed, ref} from "vue";
+import {useUserStore} from "../stores/userStore";
 
+const userStore = useUserStore()
 
-const lang = ref(localStorage.getItem('lang') || 'en');
-const time = ref(null)
-const interval = ref(null)
-function updateLang(newLang) {
-  console.log(i18n)
-  lang.value = newLang;
-  i18n.global.locale = lang.value
-  localStorage.setItem('lang', newLang);
-}
+//
+// const time = ref(null)
+// const interval = ref(null)
 
-// Return variables and functions needed in the template
-const data = {
-  lang,
-  updateLang
+const isLinkDisabled = (routeName) => {
+  if (userStore.currentUser.type === 'User') {
+    const disabledRoutesForUser = ['storage', 'index', 'groups'];
+    return disabledRoutesForUser.includes(routeName);
+  }
+  return false;
 };
 
+const isUserManagementDisabled = computed(() => isLinkDisabled('index'))
+const isUserGroupManagementDisabled = computed(() => isLinkDisabled('groups'))
+const isStorageDisabled = computed(() => isLinkDisabled('storage'))
 
 
 // const is_expanded = ref(localStorage.getItem("is_expanded") === "true");
@@ -81,7 +83,10 @@ const toggleMenu = () => {
 
 
 <style lang="scss" scoped>
-
+.disabled {
+  pointer-events: none;
+  color: gray;
+}
 
 aside {
   position: fixed;

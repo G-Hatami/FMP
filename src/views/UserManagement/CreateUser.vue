@@ -9,12 +9,17 @@
     <label>{{ $t('Last name') }}:</label>
     <input type="text" maxlength="48" v-model=lastname>
     <label>{{ $t('User Group') }}:</label>
-    <input type="text" maxlength="48" v-model=usergroup>
+    <select id="dynamicSelect" v-model="usergroup">
+      <option value="" disabled selected>Select a user</option>
+      <option v-for="group in userStore.groups" :key="group.groupName" :value="group.groupName">
+        {{ group.groupName }}
+      </option>
+    </select>
 
     <div class="createTable">
       <div class="option">
         <label>{{ $t('Creator') }}:</label>
-        <input type="text" v-model=creator>
+        <input type="text" v-model=creator readonly>
       </div>
 
       <div class="timeInput">
@@ -82,26 +87,34 @@
 import {computed, ref} from "vue";
 import {useUserStore} from "../../stores/userStore";
 
+
 const userStore = useUserStore()
-
-
 const username = ref(" ")
 const lastname = ref(" ")
 const firstname = ref(" ")
 const usergroup = ref(" ")
 const type = ref(" ")
-const creator = ref(" ")
+const creator = ref(userStore.currentUser.username)
 const creationTime = ref(" ")
 const lastModifier = ref(" ")
 const lastModificationTime = ref(" ")
 const terms = ref(false)
+const creatingTime = ref()
 
 // to handle the conditions of creating the user
 const canCreateUser = computed(() => {
   return username.value.trim() !== "" && type.value !== " " && terms.value !== false;
 })
+const recordTime = () => {
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+  creatingTime.value = `${hours}:${minutes}:${seconds}`;
+};
 
 const createUser = () => {
+  recordTime()
   const newUser = {
     username: username.value,
     firstname: firstname.value,
@@ -109,7 +122,7 @@ const createUser = () => {
     usergroup: usergroup.value,
     type: type.value,
     creator: creator.value,
-    creationTime: creationTime.value,
+    creationTime: creatingTime.value,
     lastModifier: lastModifier.value,
     lastModificationTime: lastModificationTime.value,
   };

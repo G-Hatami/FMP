@@ -4,12 +4,15 @@
     <table id="recordTable">
       <thead>
       <tr>
-
         <th>Username</th>
         <th>Firstname</th>
         <th>Lastname</th>
         <th>Type</th>
         <th>Usergroup</th>
+        <th>Creator</th>
+        <th>Creation time</th>
+        <th>Last modifier</th>
+        <th>Last modification time</th>
       </tr>
       </thead>
       <tbody>
@@ -19,6 +22,10 @@
         <td>{{ user.lastname }}</td>
         <td>{{ user.type }}</td>
         <td>{{ user.usergroup }}</td>
+        <td>{{ user.creator }}</td>
+        <td>{{ user.creationTime }}</td>
+        <td>{{ user.lastModifier }}</td>
+        <td>{{ user.lastModificationTime }}</td>
       </tr>
       </tbody>
     </table>

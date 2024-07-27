@@ -4,7 +4,7 @@
 
   <div class="container">
     <div class="input-group">
-      <label  for="input2">{{ $t('Enter username') }}</label>
+      <label for="input2">{{ $t('Enter username') }}</label>
       <input type="text" id="input2" v-model="chosenUser">
       <button class="deleteButton" @click="deleteUser">{{ $t('DELETE') }}</button>
     </div>
@@ -27,23 +27,28 @@ import {useRouter} from "vue-router";
 import UsersTable from "/src/views/MainTable/UsersTable.vue";
 import {useUserStore} from "/src/stores/userStore";
 import {ref} from "vue";
-import query from "vue-resource/src/url/query";
+
 
 
 const userStore = useUserStore()
-
+const lastModifier = ref()
 const router = useRouter();
 const chosenUser = ref("")
 // Function to navigate to update user page
 const deleteUser = () => {
   const chosen2 = chosenUser.value.trim()
   userStore.deleteUser(chosen2);
-  chosenUser.value =""
+  console.log(chosen2)
+  chosenUser.value = ""
 };
 const goToFindChosen = () => {
+  // const toSendLastModifier = userStore.users.find(user => user.username === userStore.currentUser.username)
+  // toSendLastModifier.lastModifier = userStore.currentUser.username
   const chosen3 = chosenUser.value.trim()
+  console.log(chosen3)
   if (userStore.findUser(chosen3)) {
-    router.push({path: '/updateUser', query: {username: chosen3}});
+    console.log("hiiii")
+    router.push({path: '/updateUser', query: {username: chosen3 , lastModifier:userStore.currentUser.username}});
   }
 }
 

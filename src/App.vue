@@ -7,13 +7,23 @@
 </template>
 <script setup>
 import sidebar from "./components/Sidebar.vue"
+import {onMounted} from "vue";
+import {useUserStore} from "./stores/userStore";
+import router from "./router";
 
+const userStore = useUserStore()
+
+onMounted(() => {
+  router.push({path: "/"})
+  userStore.applyTheme(userStore.defaultTheme)
+})
 </script>
 <style lang="scss">
 :root {
+  --theme-color: blue;
   --primary: #4ade80;
   --primary-alt: #22c55e;
-  --dark-alt: #334155;
+  --dark-alt: #0c56c0;
   --grey: #64748b;
   --dark: #1e293b;
   --light: #f1f5f9;
@@ -26,8 +36,22 @@ import sidebar from "./components/Sidebar.vue"
 }
 
 body {
-  background: var(--dark-alt);
+  background-color: var(--theme-color);
 }
+
+/* Define classes for each theme */
+body.blue {
+  --theme-color: blue;
+}
+
+body.green {
+  --theme-color: green;
+}
+
+body.red {
+  --theme-color: red;
+}
+
 
 * {
   margin: 0;

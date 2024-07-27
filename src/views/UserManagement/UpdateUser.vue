@@ -10,7 +10,13 @@
     <label>Last name:</label>
     <input type="text" maxlength="48" v-model=userInfo.lastname>
     <label>{{ $t('User Group') }}:</label>
-    <input type="text" maxlength="48" v-model=userInfo.usergroup>
+
+    <select  v-model="userInfo.userGroup">
+      <option value="" disabled selected>Select a user</option>
+      <option v-for="group in userStore.groups" :key="group.groupName" :value="group.groupName">
+        {{ group.groupName }}
+      </option>
+    </select>
     <div class="createTable">
       <div class="option">
         <label>Creator:</label>
@@ -98,6 +104,13 @@ const userInfo = ref({
 const terms = ref(false)
 const handleSubmit = () => {
 }
+const recordTime = () => {
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+  userInfo.lastModificationTime = `${hours}:${minutes}:${seconds}`;
+};
 
 //fetching
 onMounted(() => {
@@ -111,11 +124,17 @@ onMounted(() => {
         userInfo.value.lastname = foundUser.lastname;
         userInfo.value.usergroup = foundUser.usergroup;
         userInfo.value.type = foundUser.type;
+        userInfo.value.lastModifier = foundUser.lastModifier;
+        userInfo.value.lastModificationTime = foundUser.lastModificationTime;
+        userInfo.value.creator = foundUser.creator;
+        userInfo.value.creationTime = foundUser.creationTime;
+        userInfo.value.userGroup = foundUser.usergroup
       }
     }
 );
 
 const handleUpdates = () => {
+  recordTime()
   const beforeUpdate = route.query.username
   const updatedUser = {
     id: userInfo.value.id,
@@ -123,9 +142,13 @@ const handleUpdates = () => {
     firstname: userInfo.value.firstname,
     lastname: userInfo.value.lastname,
     usergroup: userInfo.value.userGroup,
-    type: userInfo.value.type
+    type: userInfo.value.type,
+    creator: userInfo.value.creator,
+    creationTime: userInfo.value.creationTime,
+    lastModifier: route.query.lastModifier,
+    lastModificationTime: userInfo.lastModificationTime
   }
-  userStore.updateUser(updatedUser , beforeUpdate)
+  userStore.updateUser(updatedUser, beforeUpdate)
   window.history.back()
 }
 

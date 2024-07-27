@@ -23,7 +23,7 @@
         <td>{{ user.type }}</td>
         <td>{{ user.usergroup }}</td>
         <td>
-          <button><span class="material-icons">login</span>Login</button>
+          <button @click="login(user)"><span class="material-icons">login</span>Login</button>
         </td>
       </tr>
       </tbody>
@@ -34,10 +34,22 @@
 
 <script setup>
 import {useUserStore} from "../stores/userStore";
-
+import {useRouter} from "vue-router";
 
 const userStore = useUserStore()
+const router = useRouter();
+const login = (user) => {
+  userStore.setCurrentUser(user)
+  console.log(user.username)
+  if (user.type === "Admin"){
+    console.log("jkloip")
+    router.push({path: '/'})
+  }
+  else {
+    console.log("user it is")
+  }
 
+}
 </script>
 
 <style scoped lang="scss">
@@ -76,7 +88,7 @@ table {
 
 }
 
- td {
+td {
 
   border: 1px solid #ddd;
   padding: 8px;

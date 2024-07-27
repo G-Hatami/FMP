@@ -23,32 +23,43 @@
             class="fa-solid fa-cloud-arrow-up"></i><br> upload file
         </button>
 
-        <button id="shared-button"><i class="fa-solid fa-share-nodes"></i><br>
-          share
+        <button @click="test" id="shared-button"><i class="fa-solid fa-share-nodes"></i><br>
+          test
         </button>
 
       </div>
 
-      <h1 style="color: #f1f1f1">All Files</h1>
+      <h1  style="color: #f1f1f1">{{ headerText }}</h1>
       <div class="separator"></div>
     </div>
 
     <div class="second-container">
-      <div class="file-container" v-if="uploadedFiles.length > 0">
-        <div v-for="file in uploadedFiles" :key="file.name" class="file-item">
+      <div class="file-container" id="myFilesContainer" v-show="hasUploadedFiles && displayAllFiles">
+        <div v-for="file in currentUserFiles" :key="file.name" class="file-item">
           <div class="icon-container">
             <img alt="/" :src="getFileIcon(file.name)" class="file-icon"/>
             <input @change="toggleShowOptions" class="file-checkbox" type="checkbox"
                    v-model="selectedFiles" :value="file.name"/>
           </div>
           <div class="url-container">
-            <!--            <p style="color: #213547 ; font-weight: bolder">Download link :</p>-->
             <a :href="file.url" target="_blank">{{ getShortenedName(file.name) }}</a>
             <p>{{ formatFileSize(file.size) }}</p>
           </div>
         </div>
       </div>
     </div>
+    <!--    <div class="second-container">-->
+    <!--      <div class="folder-container" id="createdFoldersContainer" v-if="hasCreatedFolders">-->
+    <!--        <div v-for="folder in currentUserFolders" :key="folder.name">-->
+    <!--          <div class="icon-container">-->
+    <!--            &lt;!&ndash; there would be only one image  />&ndash;&gt;-->
+    <!--            &lt;!&ndash;            <img alt="/" :src="getFileIcon(file.name)" class="file-icon"/>&ndash;&gt;-->
+    <!--            <input @change="toggleShowOptions" class="file-checkbox" type="checkbox"-->
+    <!--                   v-model="selectedFiles" :value="folder.name"/>-->
+    <!--          </div>-->
+    <!--        </div>-->
+    <!--      </div>-->
+    <!--    </div>-->
   </div>
   <dialog id="create-folder" v-if="isCreateDialogOpen">
     <h2><i class="fa-solid fa-folder"></i> Create new folder</h2>
@@ -56,7 +67,7 @@
     <button id="cross-button"><i class="fa-solid fa-xmark" @click="closeCreateFolderDialog"></i></button>
     <div class="create-buttons">
       <button id="cancelBtn" @click="closeCreateFolderDialog">cancel</button>
-      <button id="createBtn">create</button>
+      <button id="createBtn" @click="createFolder">create</button>
     </div>
   </dialog>
   <dialog id="delete-file" class="deleteDialog" v-if="isDeleteDialogOpen">
@@ -100,21 +111,30 @@
 
 <script setup>
 // import '@material-icons/font/css/material-icons.css';
-
+import {useUserStore} from "../../stores/userStore";
 import {computed, ref} from "vue";
 
+
+const userStore = useUserStore()
 const isCreateDialogOpen = ref(false)
 const isDeleteDialogOpen = ref(false)
 const isCopyDialogOpen = ref(false)
 const isMoveDialogOpen = ref(false)
 const isShareDialogOpen = ref(false)
-const uploadedFiles = ref([])
 const selectedFiles = ref(new Set());//remember this only contains namessssss
 const showOptions = ref(false)
-
+const displayAllFiles = ref(true)
+// const displayFolders = ref(false)
+const headerText = ref("My Files")
 const anyFileSelected = computed(() => {
   return selectedFiles.value.size > 0;
 })
+
+
+const test = () => {
+  displayAllFiles.value = true
+}
+
 const showCreateFolderDialog = () => {
   isCreateDialogOpen.value = true
   document.getElementById("create-folder").showModal()
@@ -157,35 +177,91 @@ const closeShareDialog = () => {
   document.getElementById("share-file").close()
 }
 const deleteSelections = () => {
-  if (!Array.isArray(uploadedFiles.value) || !(selectedFiles.value instanceof Set)) {
-    console.error('Invalid data structures for uploadedFiles or selectedFiles');
-    return;
-  }
-
+  const currentUser = userStore.currentUser.username;
+  const userUploads = userStore.allUploaded.find(user => user.username === currentUser);
+  console.log("user is here", userUploads)
   const selectedArray = Array.from(selectedFiles.value);
-  console.log('uploadedFiles:', uploadedFiles.value);
-  console.log('selectedFiles:', selectedFiles.value.size);
   console.log('selectedFilesArray:', selectedArray);
-
-  const filteredArray = uploadedFiles.value.filter(item => !selectedArray.includes(item.name));
-  console.log(filteredArray);
-  uploadedFiles.value = filteredArray;
-  closeDeleteDialog();
+  userUploads.upload = userUploads.upload.filter(file => !selectedArray.includes(file.name));
   selectedFiles.value.clear()
-  console.log('selectedFiles:', selectedFiles.value);
-}
+  closeDeleteDialog()
+};
+
+
 const handleUploadFile = (event) => {
   const files = event.target.files;
+  const user = userStore.currentUser.username
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
-    uploadedFiles.value.push({
-      name: file.name,
-      url: URL.createObjectURL(file),
-      size: file.size
-    });
+    if (userStore.allUploaded.length === 0) {
+      userStore.allUploaded.push({
+        username: user,
+        upload: [{
+          type: "file",
+          name: file.name,
+          url: URL.createObjectURL(file),
+          size: file.size
+        }]
+      })
+
+      console.log("this is when length is 0", userStore.allUploaded)
+    }
+    //when people have uploaded files
+    else {
+      const index = userStore.allUploaded.find(u => u.username === user)
+      //if current user uploaded
+      if (index !== undefined) {
+        index.upload.push({
+          type: "file",
+          name: file.name,
+          url: URL.createObjectURL(file),
+          size: file.size
+        })
+
+        const indexNum = userStore.allUploaded.findIndex(u => u.username === index.username)
+
+        userStore.allUploaded[indexNum] = index
+
+        console.log("this is when we found user", userStore.allUploaded)
+
+      } else {
+        userStore.allUploaded.push({
+          username: user,
+          upload: [{
+            type: "file",
+            name: file.name,
+            url: URL.createObjectURL(file),
+            size: file.size
+          }]
+        })
+        console.log("this is when index is undefined", userStore.allUploaded)
+      }
+
+    }
   }
+
 }
+const currentUserFiles = computed(() => {
+  const currentUser = userStore.currentUser.username;
+  const userUploads = userStore.allUploaded.find(user => user.username === currentUser);
+  return userUploads ? userUploads.upload : [];
+});
+const hasUploadedFiles = computed(() => {
+  const currentUser = userStore.currentUser.username;
+  const userUploads = userStore.allUploaded.find(user => user.username === currentUser);
+  return userUploads && userUploads.upload.length > 0;
+});
+const createFolder = () => {
+  // displayAllFiles.value = false
+  // displayFolders.value = true
+  // closeCreateFolderDialog()
+  // headerText.value = "Folders"
+
+}
+
+
 const getFileIcon = (fileName) => {
+  console.log(fileName)
   const extension = fileName.split('.').pop().toLowerCase();
   switch (extension) {
     case 'jpg' :
