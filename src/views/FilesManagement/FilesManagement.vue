@@ -68,20 +68,20 @@
         <!--                   v-model="selectedFiles" :value="folder.name"/>-->
 
       </div>
-      <div class="fileInFolder-container" v-show="viewState ===  'folder'">
-        <!--        <div v-for="file in currentFilesInFolders" :key="file.name">-->
-        <!--          {{file.name}}-->
-        <!--          <div class="icon-container">-->
-        <!--            <img alt="/" :src="getFileIcon(file.name)" class="file-icon"/>-->
-        <!--            <input @change="toggleShowOptions" class="file-checkbox" type="checkbox"-->
-        <!--                   v-model="selectedFiles" :value="file.name"/>-->
-        <!--          </div>-->
-        <!--          <div class="url-container">-->
-        <!--            <a :href="file.url" target="_blank">{{ getShortenedName(file.name) }}</a>-->
-        <!--            <p>{{ formatFileSize(file.size) }}</p>-->
-        <!--          </div>-->
-        <!--          </div>-->
-        <!--        </div>-->
+      <div class="fileInFolder-container" v-show="viewState ===  'folder' && filesUploadedInFolder">
+        <div style="color: #dddddd" v-for="f in filesUploadedInFolder" :key="f.name">
+          {{ f.name }}
+          <!--          <div class="icon-container">-->
+          <!--            <img alt="/" :src="getFileIcon(file.name)" class="file-icon"/>-->
+          <!--            <input @change="toggleShowOptions" class="file-checkbox" type="checkbox"-->
+          <!--                   v-model="selectedFiles" :value="file.name"/>-->
+          <!--          </div>-->
+          <!--          <div class="url-container">-->
+          <!--            <a :href="file.url" target="_blank">{{ getShortenedName(file.name) }}</a>-->
+          <!--            <p>{{ formatFileSize(file.size) }}</p>-->
+          <!--          </div>-->
+          <!--          </div>-->
+        </div>
       </div>
     </div>
   </div>
@@ -148,6 +148,7 @@ const headerText = ref("My Files")
 const viewState = ref("allFiles")
 const folderName = ref()
 const selectedFolderName = ref()
+const filesUploadedInFolder = ref()
 
 const anyFileSelected = computed(() => {
   return selectedFiles.value.size > 0;
@@ -179,13 +180,22 @@ const changeView = (view, name = '') => {
     case 'folder':
       headerText.value = `Folder: ${name}`;
       selectedFolderName.value = name
+      filesInFolders()
       break;
     default:
       headerText.value = '';
   }
 
 }
-
+const filesInFolders = () => {
+  const currentUser = userStore.currentUser.username;
+  const userCreates = userStore.allCreatedFolders.find(user => user.username === currentUser)
+  const createds = userCreates.created
+  console.log(createds)
+  const findDesiredCreated = createds.find(folder => folder.name === selectedFolderName.value)
+  console.log(findDesiredCreated.upload)
+  filesUploadedInFolder.value = findDesiredCreated.upload
+}
 
 const showCreateFolderDialog = () => {
   changeView('folders')
@@ -292,8 +302,6 @@ const handleUploadFile = (event) => {
 
       }
     } else if (viewState.value === "folder") {
-      // console.log(userStore.allCreatedFolders)
-      // console.log(selectedFolderName.value)
       const findingOwner = userStore.allCreatedFolders.find(folder => folder.username === user)
       const findingCreated = findingOwner.created.find(folder => folder.name === selectedFolderName.value)
       //if the user have not uploaded any files in selected folder
@@ -309,6 +317,7 @@ const handleUploadFile = (event) => {
 const currentUserFiles = computed(() => {
   const currentUser = userStore.currentUser.username;
   const userUploads = userStore.allUploaded.find(user => user.username === currentUser);
+  console.log(userUploads)
   return userUploads ? userUploads.upload : [];
 });
 const hasUploadedFiles = computed(() => {
@@ -329,11 +338,13 @@ const hasUploadedFiles = computed(() => {
 // const currentFilesInFolders = computed(() => {
 //   const currentUser = userStore.currentUser.username;
 //   const userCreates = userStore.allCreatedFolders.find(user => user.username === currentUser)
-//   if (userCreates.created.find(folder => folder.name === selectedFolderName.value)){
+//   console.log("this user creates", userCreates)
 //
-//   }
-//
+//   // const createdOnes = userCreates.created
+//   // console.log("this user2222", createdOnes)
+//   // return  createdOnes ? createdOnes : []
 // })
+
 
 const createFolder = (createdFolderName) => {
   if (folderName.value !== "") {
