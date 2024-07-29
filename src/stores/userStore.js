@@ -111,7 +111,7 @@ export const useUserStore = defineStore('userStore', {
             this.groups = this.groups.filter(group => group.groupName !== groupName)
         },
         setCurrentUser(user) {
-
+            console.log(this.allCreatedFolders.find(u => u.username === user.username))
             this.currentUser = user
             if (user.theme) {
                 console.log("has theme value")

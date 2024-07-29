@@ -18,7 +18,8 @@
         <button @click="showCreateFolderDialog" id="create-button"><i class="fa-solid fa-folder-plus"></i><br>
           create folder
         </button>
-        <input type="file" style="display: none" id="upload" multiple @change="handleUploadFile">
+        <input type="file" style="display: none" id="upload" multiple @change="handleUploadFile"
+               :disabled="viewState === 'folders'">
         <button id="upload-button" onclick="document.getElementById('upload').click()"><i
             class="fa-solid fa-cloud-arrow-up"></i><br> upload file
         </button>
@@ -52,9 +53,9 @@
           <div class="folderIcon">
             <img src="/src/assets/folder.svg" alt="/">
           </div>
-                    <div class="nameContainer" @click="changeView('folder', folder.name)">
-                      {{ folder.name }}
-                    </div>
+          <div class="nameContainer" @click="changeView('folder', folder.name)">
+            {{ folder.name }}
+          </div>
         </div>
 
         <!--          <div class="folder-name">-->
@@ -66,6 +67,21 @@
         <!--            <input @change="toggleShowOptions" class="file-checkbox" type="checkbox"-->
         <!--                   v-model="selectedFiles" :value="folder.name"/>-->
 
+      </div>
+      <div class="fileInFolder-container" v-show="viewState ===  'folder'">
+        <!--        <div v-for="file in currentFilesInFolders" :key="file.name">-->
+        <!--          {{file.name}}-->
+        <!--          <div class="icon-container">-->
+        <!--            <img alt="/" :src="getFileIcon(file.name)" class="file-icon"/>-->
+        <!--            <input @change="toggleShowOptions" class="file-checkbox" type="checkbox"-->
+        <!--                   v-model="selectedFiles" :value="file.name"/>-->
+        <!--          </div>-->
+        <!--          <div class="url-container">-->
+        <!--            <a :href="file.url" target="_blank">{{ getShortenedName(file.name) }}</a>-->
+        <!--            <p>{{ formatFileSize(file.size) }}</p>-->
+        <!--          </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
       </div>
     </div>
   </div>
@@ -109,9 +125,6 @@
     </button>
     <div class="folder-container">
     </div>
-    <button></button>
-    <button></button>
-
   </dialog>
 
 </template>
@@ -131,14 +144,28 @@ const isMoveDialogOpen = ref(false)
 const isShareDialogOpen = ref(false)
 const selectedFiles = ref(new Set());//remember this only contains namessssss
 const showOptions = ref(false)
-// const displayAllFiles = ref(true)
-// const displayFolders = ref(false)
 const headerText = ref("My Files")
 const viewState = ref("allFiles")
 const folderName = ref()
+const selectedFolderName = ref()
+
 const anyFileSelected = computed(() => {
   return selectedFiles.value.size > 0;
 })
+// const onUploadButtonClick = () => {
+//   console.log('Upload button clicked viewState:', viewState.value)
+//   if (viewState.value === "folders") {
+//     alert('To upload a file, please choose your desired folder first.');
+//   } else {
+//     if (fileInput.value) {
+//       console.log('File input ref found, triggering click.');
+//       fileInput.value.click();
+//     } else {
+//       console.log('$refs.upload is not defined. Ensure ref="upload" is set on the input.');
+//     }
+//   }
+//
+// }
 
 const changeView = (view, name = '') => {
   viewState.value = view;
@@ -151,6 +178,7 @@ const changeView = (view, name = '') => {
       break;
     case 'folder':
       headerText.value = `Folder: ${name}`;
+      selectedFolderName.value = name
       break;
     default:
       headerText.value = '';
@@ -218,37 +246,8 @@ const handleUploadFile = (event) => {
   const user = userStore.currentUser.username
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
-    if (userStore.allUploaded.length === 0) {
-      userStore.allUploaded.push({
-        username: user,
-        upload: [{
-          type: "file",
-          name: file.name,
-          url: URL.createObjectURL(file),
-          size: file.size
-        }]
-      })
-
-      console.log("this is when length is 0", userStore.allUploaded)
-    }
-    //when people have uploaded files
-    else {
-      const index = userStore.allUploaded.find(u => u.username === user)
-      //if current user uploaded
-      if (index !== undefined) {
-        index.upload.push({
-          type: "file",
-          name: file.name,
-          url: URL.createObjectURL(file),
-          size: file.size
-        })
-
-        const indexNum = userStore.allUploaded.findIndex(u => u.username === index.username)
-        userStore.allUploaded[indexNum] = index
-
-        console.log("this is when we found user", userStore.allUploaded)
-
-      } else {
+    if (viewState.value === "allFiles") {
+      if (userStore.allUploaded.length === 0) {
         userStore.allUploaded.push({
           username: user,
           upload: [{
@@ -258,12 +257,54 @@ const handleUploadFile = (event) => {
             size: file.size
           }]
         })
-        console.log("this is when index is undefined", userStore.allUploaded)
-      }
 
+        console.log("this is when length is 0", userStore.allUploaded)
+      }
+      //when people have uploaded files
+      else {
+        const index = userStore.allUploaded.find(u => u.username === user)
+        //if current user uploaded
+        if (index !== undefined) {
+          index.upload.push({
+            type: "file",
+            name: file.name,
+            url: URL.createObjectURL(file),
+            size: file.size
+          })
+
+          const indexNum = userStore.allUploaded.findIndex(u => u.username === index.username)
+          userStore.allUploaded[indexNum] = index
+
+          console.log("this is when we found user", userStore.allUploaded)
+
+        } else {
+          userStore.allUploaded.push({
+            username: user,
+            upload: [{
+              type: "file",
+              name: file.name,
+              url: URL.createObjectURL(file),
+              size: file.size
+            }]
+          })
+          console.log("this is when index is undefined", userStore.allUploaded)
+        }
+
+      }
+    } else if (viewState.value === "folder") {
+      // console.log(userStore.allCreatedFolders)
+      // console.log(selectedFolderName.value)
+      const findingOwner = userStore.allCreatedFolders.find(folder => folder.username === user)
+      const findingCreated = findingOwner.created.find(folder => folder.name === selectedFolderName.value)
+      //if the user have not uploaded any files in selected folder
+      findingCreated.upload.push({
+        type: "file",
+        name: file.name,
+        url: URL.createObjectURL(file),
+        size: file.size
+      })
     }
   }
-
 }
 const currentUserFiles = computed(() => {
   const currentUser = userStore.currentUser.username;
@@ -275,7 +316,24 @@ const hasUploadedFiles = computed(() => {
   const userUploads = userStore.allUploaded.find(user => user.username === currentUser);
   return userUploads && userUploads.upload.length > 0;
 });
-
+// const hasUploadedFilesInFolder = computed(() => {
+//   const currentUser = userStore.currentUser.username;
+//   const userCreates = userStore.allCreatedFolders.find(user => user.username === currentUser)
+//   if (userCreates.created === undefined){
+//     return false
+//   }
+//   const desiredFolder = userCreates.created.find(folder => folder.name === selectedFolderName.value)
+//   return desiredFolder && desiredFolder.upload.length > 0
+//
+// })
+// const currentFilesInFolders = computed(() => {
+//   const currentUser = userStore.currentUser.username;
+//   const userCreates = userStore.allCreatedFolders.find(user => user.username === currentUser)
+//   if (userCreates.created.find(folder => folder.name === selectedFolderName.value)){
+//
+//   }
+//
+// })
 
 const createFolder = (createdFolderName) => {
   if (folderName.value !== "") {
@@ -284,23 +342,14 @@ const createFolder = (createdFolderName) => {
     closeCreateFolderDialog()
     const currentUser = userStore.currentUser.username
     const findUser = userStore.allCreatedFolders.find(u => u.username === currentUser)
-    // if (userStore.allCreatedFolders.length === 0) {
-    //   userStore.allCreatedFolders.push({
-    //     username: currentUser,
-    //     created: [{
-    //       type: "folder",
-    //       name: folderName
-    //     }]
-    //   })
-    //   console.log("this is when no one created", userStore.allCreatedFolders)
-    // }
 //if our desired do not exist
     if (findUser === undefined) {
       userStore.allCreatedFolders.push({
         username: currentUser,
         created: [{
           type: "folder",
-          name: createdFolderName
+          name: createdFolderName,
+          upload: []
         }]
       })
       console.log("this is when index is undefined", userStore.allCreatedFolders)
@@ -310,7 +359,8 @@ const createFolder = (createdFolderName) => {
     else {
       findUser.created.push({
             type: "folder",
-            name: createdFolderName
+            name: createdFolderName,
+            upload: []
           }
       )
       const findIndex = userStore.allCreatedFolders.find(u => u.username === findUser.username)
@@ -674,10 +724,11 @@ h1 {
 .url-container a:hover {
   text-decoration: underline;
 }
-.nameContainer{
+
+.nameContainer {
   text-align: center;
   text-decoration: underline;
-
+  cursor: pointer;
 }
 
 .deleteDialog {
