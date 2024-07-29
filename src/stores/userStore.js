@@ -19,6 +19,7 @@ export const useUserStore = defineStore('userStore', {
         defaultTheme: 'blue',
         groups: [],
         allUploaded: [],
+        allCreatedFolders: [],
         name: "pinia",
 
     }),

@@ -24,18 +24,18 @@
 
       <div class="timeInput">
         <label>{{ $t('creationTime') }}:</label>
-        <input type="text" v-model=creationTime>
+        <input type="text" v-model=creationTime readonly>
       </div>
     </div>
 
     <div class="updateTable">
       <div class="option">
         <label>{{ $t('lastModifier') }}</label>
-        <input type="text" v-model=lastModifier>
+        <input type="text" v-model=lastModifier readonly>
       </div>
       <div class="timeInput">
         <label>{{ $t('lastModificationTime') }}:</label>
-        <input type="text" v-model=lastModificationTime>
+        <input type="text" v-model=lastModificationTime readonly>
       </div>
     </div>
 

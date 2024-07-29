@@ -27,7 +27,7 @@
       </table>
 
       <dialog id="deleteDialog" class="deleteDialog" v-if="selectedGroup">
-        <h2>Delete<em> User</em></h2>
+        <h2>Delete<em> UserGroup</em></h2>
         <p>Are you sure you want to delete {{ selectedGroup.groupName }}?</p>
         <button class="yesBtn" @click="deleteGroup11">Yes</button>
         <button class="noBtn" @click="closeDeleteDialog">No</button>
@@ -129,7 +129,7 @@ const isUserSelected = (username) => {
 
 
 const update = () => {
-  if (tempGroupName.value.trim().length <= 48 && tempGroupName.value.trim().length >= 5){
+  if (tempGroupName.value.trim().length <= 48 && tempGroupName.value.trim().length >= 5) {
 
     const updatedGroup = {
       groupName: tempGroupName.value,
@@ -141,8 +141,7 @@ const update = () => {
 
     closeUpdateDialog()
     console.log("helllo")
-  }
-  else {
+  } else {
     alert("The name should contains at least 5 char!")
   }
 
