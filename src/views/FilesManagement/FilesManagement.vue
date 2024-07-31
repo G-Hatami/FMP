@@ -2,20 +2,9 @@
 
   <div>
     <div class="first-container">
-      <div v-if="anyFileSelected" class="features">
-        <button @click="showDeleteDialog" style="color: #1e293b "><i class="fa-solid fa-trash"></i>Delete</button>
-        <button @click="showShareDialog" style="color: #1e293b "><i class="fa-solid fa-share-from-square"></i>Share
-        </button>
-        <button @click="showCopyDialog" style="color: #1e293b "><i class="fa-solid fa-copy"></i>Copy</button>
-        <button @click="deleteFile" style="color: #1e293b "><i class="fa-solid fa-download"></i>Download</button>
-        <button @click="showMoveDialog" style="color: #1e293b "><i class="fa-solid fa-arrow-right"></i>Move
-        </button>
-        <button @click="closeFeatures" id="cancel-selection"><i class="fa-solid fa-xmark"></i> {{ selectedFiles.size }}
-          selected
-        </button>
-      </div>
       <div class="button">
-        <button @click="showCreateFolderDialog" id="create-button"><i class="fa-solid fa-folder-plus"></i><br>
+        <button @click="showDialogs('isCreateDialogOpen' , 'create-folder')" id="create-button"><i
+            class="fa-solid fa-folder-plus"></i><br>
           create folder
         </button>
         <input type="file" style="display: none" id="upload" multiple @change="handleUploadFile"
@@ -33,7 +22,24 @@
         <div class="line"></div>
       </div>
     </div>
-
+    <div v-if="anyFileSelected" class="features">
+      <button @click="showDialogs('isDeleteDialogOpen' , 'delete-file')" style="color: #1e293b "><i
+          class="fa-solid fa-trash"></i>Delete
+      </button>
+      <button @click="showDialogs('isShareDialogOpen' , 'share-file' )" style="color: #1e293b "><i
+          class="fa-solid fa-share-from-square"></i>Share
+      </button>
+      <button @click="showDialogs('isCopyDialogOpen' , 'copy-file' )" style="color: #1e293b "><i
+          class="fa-solid fa-copy"></i>Copy
+      </button>
+      <button @click="downloadFile" style="color: #1e293b "><i class="fa-solid fa-download"></i>Download</button>
+      <button @click="showDialogs('isMoveDialogOpen' , 'move-file')" style="color: #1e293b "><i
+          class="fa-solid fa-arrow-right"></i>Move
+      </button>
+      <button @click="closeFeatures" id="cancel-selection"><i class="fa-solid fa-xmark"></i> {{ selectedFiles.size }}
+        selected
+      </button>
+    </div>
     <div class="second-container">
       <div class="file-container" id="myFilesContainer" v-show="hasUploadedFiles && viewState === 'allFiles'">
         <div v-for="file in currentUserFiles" :key="file.name" class="file-item">
@@ -49,7 +55,7 @@
         </div>
       </div>
       <div class="folder-container" id="createdFoldersContainer" v-show="hasCreatedFolders && viewState === 'folders'">
-        <div v-for="folder in currentUserFolders" :key="folder.name" class="folder-item">
+        <div v-for="folder in currentUserFolders" :key="folder.name" class="folders-item">
           <div class="folderIcon">
             <img src="/src/assets/folder.svg" alt="/">
           </div>
@@ -68,44 +74,48 @@
         <!--                   v-model="selectedFiles" :value="folder.name"/>-->
 
       </div>
-      <div class="fileInFolder-container" v-show="viewState ===  'folder' && filesUploadedInFolder">
-        <div style="color: #dddddd" v-for="f in filesUploadedInFolder" :key="f.name">
-          {{ f.name }}
-          <!--          <div class="icon-container">-->
-          <!--            <img alt="/" :src="getFileIcon(file.name)" class="file-icon"/>-->
-          <!--            <input @change="toggleShowOptions" class="file-checkbox" type="checkbox"-->
-          <!--                   v-model="selectedFiles" :value="file.name"/>-->
-          <!--          </div>-->
-          <!--          <div class="url-container">-->
-          <!--            <a :href="file.url" target="_blank">{{ getShortenedName(file.name) }}</a>-->
-          <!--            <p>{{ formatFileSize(file.size) }}</p>-->
-          <!--          </div>-->
-          <!--          </div>-->
+      <div class="fileInFolder-container" v-show="viewState ===  'folder'">
+        <div style="color: #dddddd" class="folder-item" v-for="f in filesUploadedInFolder" :key="f.name">
+
+          <div class="icon-container">
+            <img alt="/" :src="getFileIcon(f.name)" class="file-icon"/>
+            <input @change="toggleShowOptions" class="file-checkbox" type="checkbox"
+                   v-model="selectedFiles" :value="f.name"/>
+          </div>
+          <div class="url-container">
+            <a :href="f.url" target="_blank">{{ getShortenedName(f.name) }}</a>
+            <p>{{ formatFileSize(f.size) }}</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
   <dialog id="create-folder" v-if="isCreateDialogOpen">
     <h2><i class="fa-solid fa-folder"></i> Create new folder</h2>
     <input placeholder="Enter folder name" class="folder-name" type="text" v-model="folderName " required>
-    <button id="cross-button"><i class="fa-solid fa-xmark" @click="closeCreateFolderDialog"></i></button>
+    <button id="cross-button"><i class="fa-solid fa-xmark"
+                                 @click="closeDialogs('isCreateDialogOpen' , 'create-folder')"></i></button>
     <div class="create-buttons">
-      <button id="cancelBtn" @click="closeCreateFolderDialog">cancel</button>
+      <button id="cancelBtn" @click="closeDialogs('isCreateDialogOpen' , 'create-folder')">cancel</button>
       <button id="createBtn" @click="createFolder(folderName)">create</button>
     </div>
   </dialog>
   <dialog id="delete-file" class="deleteDialog" v-if="isDeleteDialogOpen">
-    <button @click="closeDeleteDialog" id="cross-button"><i class="fa-solid fa-xmark"></i></button>
+    <button @click="closeDialogs('isDeleteDialogOpen' , 'delete-file')" id="cross-button"><i
+        class="fa-solid fa-xmark"></i></button>
     <h2><i class="fa-solid fa-circle-exclamation" style="color: #64748b;"></i>Delete two items?</h2><br>
     <p>Are You sure you want to delete files ? if you remove this file it will be send to recycle bin ?</p>
     <div class="deleteBtn">
-      <button id="cancelBtn2" @click="closeDeleteDialog">Cancel</button>
+      <button id="cancelBtn2" @click="closeDialogs('isDeleteDialogOpen' , 'delete-file')">Cancel</button>
       <button id="deleteBtn" @click="deleteSelections">Delete</button>
     </div>
   </dialog>
 
   <dialog id="copy-file" class="moveDialog" v-if="isCopyDialogOpen">
-    <button @click="closeCopyDialog" id="cross-button"><i class="fa-solid fa-xmark" style="color: #1e293b"></i></button>
+    <button @click="closeDialogs('isCopyDialogOpen' , 'copy-file')" id="cross-button"><i class="fa-solid fa-xmark"
+                                                                                         style="color: #1e293b"></i>
+    </button>
     <div class="folder-container">
     </div>
     <button></button>
@@ -113,7 +123,9 @@
   </dialog>
 
   <dialog id="move-file" class="copyDialog" v-if="isMoveDialogOpen">
-    <button @click="closeMoveDialog" id="cross-button"><i class="fa-solid fa-xmark" style="color: #1e293b"></i></button>
+    <button @click="closeDialogs('isMoveDialogOpen' , 'move-file')" id="cross-button"><i class="fa-solid fa-xmark"
+                                                                                         style="color: #1e293b"></i>
+    </button>
     <div class="folder-container">
     </div>
     <button></button>
@@ -121,7 +133,8 @@
 
   </dialog>
   <dialog id="share-file" class="shareDialog" v-if="isShareDialogOpen">
-    <button @click="closeShareDialog" id="cross-button"><i class="fa-solid fa-xmark" style="color: #1e293b"></i>
+    <button @click="closeDialogs('isShareDialogOpen' , 'share-file')" id="cross-button"><i class="fa-solid fa-xmark"
+                                                                                           style="color: #1e293b"></i>
     </button>
     <div class="folder-container">
     </div>
@@ -148,39 +161,26 @@ const headerText = ref("My Files")
 const viewState = ref("allFiles")
 const folderName = ref()
 const selectedFolderName = ref()
-const filesUploadedInFolder = ref()
-
+const filesUploadedInFolder = ref([])
 const anyFileSelected = computed(() => {
   return selectedFiles.value.size > 0;
 })
-// const onUploadButtonClick = () => {
-//   console.log('Upload button clicked viewState:', viewState.value)
-//   if (viewState.value === "folders") {
-//     alert('To upload a file, please choose your desired folder first.');
-//   } else {
-//     if (fileInput.value) {
-//       console.log('File input ref found, triggering click.');
-//       fileInput.value.click();
-//     } else {
-//       console.log('$refs.upload is not defined. Ensure ref="upload" is set on the input.');
-//     }
-//   }
-//
-// }
-
 const changeView = (view, name = '') => {
   viewState.value = view;
   switch (view) {
     case 'allFiles':
       headerText.value = 'My Files';
+      closeFeatures()
       break;
     case 'folders':
       headerText.value = 'My Folders';
+      closeFeatures()
       break;
     case 'folder':
       headerText.value = `Folder: ${name}`;
       selectedFolderName.value = name
       filesInFolders()
+      closeFeatures()
       break;
     default:
       headerText.value = '';
@@ -191,71 +191,84 @@ const filesInFolders = () => {
   const currentUser = userStore.currentUser.username;
   const userCreates = userStore.allCreatedFolders.find(user => user.username === currentUser)
   const createds = userCreates.created
-  console.log(createds)
+  console.log("createds are :", createds)
   const findDesiredCreated = createds.find(folder => folder.name === selectedFolderName.value)
-  console.log(findDesiredCreated.upload)
-  filesUploadedInFolder.value = findDesiredCreated.upload
+  console.log("uploads are", findDesiredCreated.uploads)
+  filesUploadedInFolder.value = findDesiredCreated.uploads
+  console.log("after assign", filesUploadedInFolder.value)
 }
 
-const showCreateFolderDialog = () => {
-  changeView('folders')
-  isCreateDialogOpen.value = true
-  document.getElementById("create-folder").showModal()
+const showDialogs = (dialogName, dialogId) => {
+  switch (dialogName) {
+    case 'isCreateDialogOpen' :
+      changeView("folders")
+      isCreateDialogOpen.value = true
+      console.log(isCreateDialogOpen)
+      break;
+    case 'isDeleteDialogOpen':
+      isDeleteDialogOpen.value = true
+      break;
+    case 'isCopyDialogOpen' :
+      isCopyDialogOpen.value = true
+      break;
+    case 'isShareDialogOpen':
+      isShareDialogOpen.value = true
+      break;
+    case 'isMoveDialogOpen':
+      isMoveDialogOpen.value = true
+      break;
+  }
+  document.getElementById(dialogId).showModal()
 }
-const closeCreateFolderDialog = () => {
-  isCreateDialogOpen.value = false
-  document.getElementById("create-folder").close()
-  // console.log(typeof BigInt === 'function');
+const closeDialogs = (dialogName, dialogId) => {
+  switch (dialogName) {
+    case 'isCreateDialogOpen' :
+      isCreateDialogOpen.value = false;
+      break;
+    case 'isDeleteDialogOpen':
+      isDeleteDialogOpen.value = false;
+      break;
+    case 'isShareDialogOpen' :
+      isShareDialogOpen.value = false;
+      break;
+    case 'isMoveDialogOpen' :
+      isMoveDialogOpen.value = false;
+      break;
+    case 'isCopyDialogOpen' :
+      isCopyDialogOpen.value = false;
+      break;
+  }
+  document.getElementById(dialogId).close()
 }
-const closeDeleteDialog = () => {
-  isDeleteDialogOpen.value = false
-  document.getElementById("delete-file").close()
-}
-const showDeleteDialog = () => {
-  isDeleteDialogOpen.value = true
-  document.getElementById("delete-file").showModal()
-}
-const showCopyDialog = () => {
-  isCopyDialogOpen.value = true
-  document.getElementById("copy-file").showModal()
-}
-const closeCopyDialog = () => {
-  isCopyDialogOpen.value = false
-  document.getElementById("copy-file").close()
-}
-const showMoveDialog = () => {
-  isMoveDialogOpen.value = true
-  document.getElementById("move-file").showModal()
-}
-const closeMoveDialog = () => {
-  isMoveDialogOpen.value = false
-  document.getElementById("move-file").close()
-}
-const showShareDialog = () => {
-  isShareDialogOpen.value = true
-  document.getElementById("share-file").showModal()
-}
-const closeShareDialog = () => {
-  isShareDialogOpen.value = false
-  document.getElementById("share-file").close()
-}
+
 const deleteSelections = () => {
   const currentUser = userStore.currentUser.username;
-  const userUploads = userStore.allUploaded.find(user => user.username === currentUser);
-  console.log("user is here", userUploads)
-  const selectedArray = Array.from(selectedFiles.value);
-  console.log('selectedFilesArray:', selectedArray);
-  userUploads.upload = userUploads.upload.filter(file => !selectedArray.includes(file.name));
-  selectedFiles.value.clear()
-  closeDeleteDialog()
-};
+  userStore.allUploaded.find(file => file.username === currentUser && file.folder)
+  // const selectedArray = Array.from(selectedFiles.value);
+//   // if (viewState.value === "allFiles") {
+//   const userUploads = userStore.allUploaded.find(user => user.username === currentUser);
+//   console.log("user is here", userUploads)
+//   console.log('selectedFilesArray:', selectedArray);
+//   userUploads.upload = userUploads.upload.filter(file => !selectedArray.includes(file.name));
+//   // else if (viewState.value === "folder") {
+//   const userCreated = userStore.allCreatedFolders.find(folder => folder.username === currentUser)
+//   console.log(userCreated.created)
+//   const desiredCreated = userCreated.created.find(folder => folder.name === selectedFolderName.value)
+//   console.log(desiredCreated)
+//   filesUploadedInFolder.value = desiredCreated.uploads.filter(uploaded => !selectedArray.includes(uploaded.name))
+// }
+//   selectedFiles.value.clear()
+//   closeDeleteDialog()
+// };}
 
+}
 
 const handleUploadFile = (event) => {
   const files = event.target.files;
   const user = userStore.currentUser.username
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
+    //if we are uploading in "all files" we should initialize the folder name to null
     if (viewState.value === "allFiles") {
       if (userStore.allUploaded.length === 0) {
         userStore.allUploaded.push({
@@ -264,7 +277,8 @@ const handleUploadFile = (event) => {
             type: "file",
             name: file.name,
             url: URL.createObjectURL(file),
-            size: file.size
+            size: file.size,
+            folder: null
           }]
         })
 
@@ -279,13 +293,13 @@ const handleUploadFile = (event) => {
             type: "file",
             name: file.name,
             url: URL.createObjectURL(file),
-            size: file.size
+            size: file.size,
+            folder: null
           })
-
           const indexNum = userStore.allUploaded.findIndex(u => u.username === index.username)
           userStore.allUploaded[indexNum] = index
-
           console.log("this is when we found user", userStore.allUploaded)
+
 
         } else {
           userStore.allUploaded.push({
@@ -294,22 +308,28 @@ const handleUploadFile = (event) => {
               type: "file",
               name: file.name,
               url: URL.createObjectURL(file),
-              size: file.size
+              size: file.size,
+              folder: null
             }]
           })
           console.log("this is when index is undefined", userStore.allUploaded)
         }
-
       }
-    } else if (viewState.value === "folder") {
+    }
+  }
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i]
+    if (viewState.value === "folder") {
       const findingOwner = userStore.allCreatedFolders.find(folder => folder.username === user)
       const findingCreated = findingOwner.created.find(folder => folder.name === selectedFolderName.value)
+      console.log(findingCreated)
       //if the user have not uploaded any files in selected folder
-      findingCreated.upload.push({
+      findingCreated.uploads.push({
         type: "file",
         name: file.name,
         url: URL.createObjectURL(file),
-        size: file.size
+        size: file.size,
+        folder: selectedFolderName.value
       })
     }
   }
@@ -325,32 +345,12 @@ const hasUploadedFiles = computed(() => {
   const userUploads = userStore.allUploaded.find(user => user.username === currentUser);
   return userUploads && userUploads.upload.length > 0;
 });
-// const hasUploadedFilesInFolder = computed(() => {
-//   const currentUser = userStore.currentUser.username;
-//   const userCreates = userStore.allCreatedFolders.find(user => user.username === currentUser)
-//   if (userCreates.created === undefined){
-//     return false
-//   }
-//   const desiredFolder = userCreates.created.find(folder => folder.name === selectedFolderName.value)
-//   return desiredFolder && desiredFolder.upload.length > 0
-//
-// })
-// const currentFilesInFolders = computed(() => {
-//   const currentUser = userStore.currentUser.username;
-//   const userCreates = userStore.allCreatedFolders.find(user => user.username === currentUser)
-//   console.log("this user creates", userCreates)
-//
-//   // const createdOnes = userCreates.created
-//   // console.log("this user2222", createdOnes)
-//   // return  createdOnes ? createdOnes : []
-// })
-
 
 const createFolder = (createdFolderName) => {
   if (folderName.value !== "") {
     console.log(createdFolderName)
     changeView('folders')
-    closeCreateFolderDialog()
+    closeDialogs('isCreateDialogOpen' , 'create-folder')
     const currentUser = userStore.currentUser.username
     const findUser = userStore.allCreatedFolders.find(u => u.username === currentUser)
 //if our desired do not exist
@@ -360,7 +360,7 @@ const createFolder = (createdFolderName) => {
         created: [{
           type: "folder",
           name: createdFolderName,
-          upload: []
+          uploads: []
         }]
       })
       console.log("this is when index is undefined", userStore.allCreatedFolders)
@@ -371,7 +371,7 @@ const createFolder = (createdFolderName) => {
       findUser.created.push({
             type: "folder",
             name: createdFolderName,
-            upload: []
+            uploads: []
           }
       )
       const findIndex = userStore.allCreatedFolders.find(u => u.username === findUser.username)
@@ -379,7 +379,6 @@ const createFolder = (createdFolderName) => {
       console.log("this is when we found user", userStore.allCreatedFolders)
       folderName.value = ""
     }
-
   } else {
     alert("Please set a name for your folder")
   }
@@ -397,7 +396,7 @@ const hasCreatedFolders = computed(() => {
 
 
 const getFileIcon = (fileName) => {
-  console.log(fileName)
+  // console.log(fileName)
   const extension = fileName.split('.').pop().toLowerCase();
   switch (extension) {
     case 'jpg' :
@@ -424,7 +423,7 @@ const closeFeatures = () => {
   selectedFiles.value.clear()
   showOptions.value = false
 }
-const deleteFile = () => {
+const downloadFile = () => {
   for (let i = 1; i <= selectedFiles.value.size; i++) {
     const blob = new Blob([""], {type: "text/plain"});
     const url = window.URL.createObjectURL(blob);
@@ -461,25 +460,27 @@ const deleteFile = () => {
 .features {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  gap: 3px;
-  position: absolute;
-  top: 68%;
-  left: 48%;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  position: fixed;
+  top: 36.5%;
+  left: 17%;
   background-color: white;
-  width: 700px;
-  height: 50px;
-  border-radius: 10px;
-  box-shadow: 1px 9px 5px var(--dark);
+  width: 1000px;
+  height: 55px;
+  border-radius: 20px;
+  box-shadow: 3px 7px 8px var(--dark);
+  padding: 2px;
 }
 
 
 .features button {
-  margin-top: 5px;
+  margin-top: 2px;
   margin-left: 4px;
   background: none;
   border: none;
-  border-radius: 2px;
+  border-radius: 3px;
   color: #1e293b;
   font-size: 16px;
   font-weight: bolder;
@@ -519,10 +520,10 @@ const deleteFile = () => {
 .second-container {
   overflow-y: scroll;
   position: fixed;
-  top: 278px;
+  top: 340px;
   left: 180px;
-  height: 467.4px;
-  width: 1528px;
+  height: 450px;
+  width: 1520px;
 }
 
 .button {
@@ -665,13 +666,23 @@ h1 {
 }
 
 .file-container {
+  height: 420px;
+  width: 500px;
   position: absolute;
   display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.fileInFolder-container {
+  position: absolute;
+  margin: 10px 0;
+  display: grid;
+  gap: 35px;
   grid-template-columns: repeat(5, 1fr);
 }
 
 
-.file-item, .folder-item {
+.file-item, .folders-item, .folder-item {
   position: relative;
   top: 20%;
   //flex-direction: row;
