@@ -1,21 +1,108 @@
-<!--          <div class="dropdown-container">-->
-          <!--            <div class="selected-option" @click="toggleDropDown">{{ selectedGroupMem }}</div>-->
-          <!--            <div class="options-container" v-if="isOpen">-->
-          <!--              <div v-for="user in userStore.users" :key="user.username" @click="toggleUser(user.username)"-->
-          <!--                   :class="{'option': true , 'selected' : isUserSelected(user.username)}"-->
-          <!--                   role="button" tabindex="0" @keydown.enter="toggleUser(user.username)"-->
-          <!--                   @keydown.space="toggleUser(user.username)">-->
-          <!--                {{ user.username }}-->
-          <!--              </div>-->
-          <!--            </div>-->
+If you want to allow the selection of multiple users, you need to update your code to handle an array of selected users instead of a single user. Here’s how you can adjust the component to support multiple selections:
 
-          <!--          </div>-->
+### Updated Dialog Component for Multiple Selections
 
-          <!--          <div>-->
-          <!--            <select class="custom-select" id="updateSelection" multiple>-->
-          <!--              <option style="color: #213547" v-for="user in userStore.users" :key="user.username">-->
-          <!--                {{ user.username }}-->
-          <!--              </option>-->
-          <!--            </select>-->
-          <!--          </div>-->
-          <!--          @change="updatedOptions" v-model="selectedUsers"-->
+#### Template
+
+Update the template to handle multiple selections and toggle the selection status of each user.
+
+```html
+<template>
+  <dialog id="share-file" class="shareDialog" v-if="isShareDialogOpen">
+    <button @click="closeDialogs('isShareDialogOpen', 'share-file')" id="cross-button">
+      <i class="fa-solid fa-xmark" style="color: #1e293b"></i>
+    </button>
+    <div class="destinationList">
+      <table>
+        <tbody>
+          <tr v-for="user in userStore.users" :key="user.username"
+              :class="{ selected: isSelected(user) }" @click="toggleUserSelection(user)">
+            <td>{{ user.username }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="dialog-buttons">
+      <button @click="share">Share</button>
+      <button @click="closeDialogs('isShareDialogOpen', 'share-file')">Cancel</button>
+    </div>
+  </dialog>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      isShareDialogOpen: false,
+      selectedUsers: [],
+      userStore: {
+        users: [
+          {
+            username: "Admin",
+            type: "Admin",
+            lastModifier: "",
+            allFiles: {
+              userFiles: [],
+              folders: [],
+              sharedWithMe: [],
+            },
+          },
+          // Add more users as needed
+        ],
+      },
+    };
+  },
+  methods: {
+    closeDialogs(dialogName, dialogId) {
+      this[dialogName] = false;
+      document.getElementById(dialogId).close();
+    },
+    toggleUserSelection(user) {
+      const index = this.selectedUsers.findIndex(u => u.username === user.username);
+      if (index === -1) {
+        this.selectedUsers.push(user);
+      } else {
+        this.selectedUsers.splice(index, 1);
+      }
+    },
+    isSelected(user) {
+      return this.selectedUsers.some(u => u.username === user.username);
+    },
+    share() {
+      // Add your share logic here
+      console.log('Sharing with:', this.selectedUsers);
+    },
+  },
+};
+</script>
+
+<style scoped>
+.selected {
+  background-color: #e0e0e0;
+}
+</style>
+```
+
+### Explanation
+
+1. **Template**:
+   - Use `:class="{ selected: isSelected(user) }"` to apply a class when a user is selected.
+   - Call `toggleUserSelection(user)` to add or remove the user from the `selectedUsers` array.
+
+2. **Data**:
+   - Define `selectedUsers` as an array to hold the selected users.
+
+3. **Methods**:
+   - `toggleUserSelection`: Adds or removes the user from the `selectedUsers` array.
+   - `isSelected`: Checks if a user is in the `selectedUsers` array.
+   - `closeDialogs`: Closes the dialog.
+   - `share`: Handles the sharing logic, now logging the selected users.
+
+4. **Styling**:
+   - The `.selected` class is used to highlight the selected rows.
+
+### Additional Notes
+
+- Ensure your `userStore` and `users` array are populated correctly.
+- The `share` method should be updated with the actual logic for sharing files with the selected users.
+- This approach allows multiple users to be selected and deselected by clicking on them.

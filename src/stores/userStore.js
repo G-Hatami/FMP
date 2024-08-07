@@ -10,18 +10,25 @@ export const useUserStore = defineStore('userStore', {
         users: [{
             username: "Admin",
             type: "Admin",
-            lastModifier: ""
+            lastModifier: "",
+            //every file has a folder attribute
+            //each file has an object and has some attributed specified to that file
+            allFiles: {
+                userFiles: [],
+                //this contains name of folders
+                folders: [],
+                sharedWithMe: [],
+            }
         }],
         currentUser: {
             username: "Admin",
-            type: "Admin"
+            type: "Admin",
+            theme: "blue",
+            lang: "EN",
         },
         defaultTheme: 'blue',
         groups: [],
-        allUploaded: [],
-        allCreatedFolders: [],
         name: "pinia",
-
     }),
     actions: {
 
@@ -110,29 +117,25 @@ export const useUserStore = defineStore('userStore', {
         setCurrentUser(user) {
             // console.log(this.allCreatedFolders.find(u => u.username === user.username))
             this.currentUser = user
+            console.log(this.users)
+            console.log(this.currentUser.allFiles.userFiles)
             if (user.theme) {
                 console.log("has theme value")
-
                 this.setTheme(user.theme)
-
             } else {
                 console.log("has not theme value")
-
+                this.currentUser.theme = "blue"
                 this.applyTheme(this.defaultTheme)
             }
             if (user.lang) {
                 console.log("has lang value")
-
                 this.setLang(user.lang)
             } else {
                 console.log("has not lang value")
-
+                this.currentUser.lang = 'EN'
                 this.applyLang(i18n.global.locale)
             }
         },
-
-        getters: {}
-
     }
 
 

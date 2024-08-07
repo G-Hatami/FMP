@@ -17,28 +17,28 @@
         {{ group.groupName }}
       </option>
     </select>
-    <div class="createTable">
-      <div class="option">
-        <label>Creator:</label>
-        <input type="text" v-model=userInfo.creator>
-      </div>
+<!--    <div class="createTable">-->
+<!--      <div class="option">-->
+<!--        <label>Creator:</label>-->
+<!--        <input type="text" v-model=userInfo.creator>-->
+<!--      </div>-->
 
-      <div class="timeInput">
-        <label>creationTime:</label>
-        <input type="text" v-model=userInfo.creationTime>
-      </div>
-    </div>
+<!--      <div class="timeInput">-->
+<!--        <label>creationTime:</label>-->
+<!--        <input type="text" v-model=userInfo.creationTime>-->
+<!--      </div>-->
+<!--    </div>-->
 
-    <div class="updateTable">
-      <div class="option">
-        <label>lastModifier</label>
-        <input type="text" v-model=userInfo.lastModifier>
-      </div>
-      <div class="timeInput">
-        <label>lastModificationTime:</label>
-        <input type="text" v-model=userInfo.lastModificationTime>
-      </div>
-    </div>
+<!--    <div class="updateTable">-->
+<!--      <div class="option">-->
+<!--        <label>lastModifier</label>-->
+<!--        <input type="text" v-model=userInfo.lastModifier>-->
+<!--      </div>-->
+<!--      <div class="timeInput">-->
+<!--        <label>lastModificationTime:</label>-->
+<!--        <input type="text" v-model=userInfo.lastModificationTime>-->
+<!--      </div>-->
+<!--    </div>-->
 
     <label>Type:</label>
     <select v-model="userInfo.type" required>
@@ -146,7 +146,12 @@ const handleUpdates = () => {
     creator: userInfo.value.creator,
     creationTime: userInfo.value.creationTime,
     lastModifier: route.query.lastModifier,
-    lastModificationTime: userInfo.lastModificationTime
+    lastModificationTime: userInfo.lastModificationTime,
+    allFiles: {
+      userFiles: [],
+      folders: [],
+      sharedWithMe: [],
+    },
   }
   userStore.updateUser(updatedUser, beforeUpdate)
   window.history.back()

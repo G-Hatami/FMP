@@ -16,28 +16,28 @@
       </option>
     </select>
 
-    <div class="createTable">
-      <div class="option">
-        <label>{{ $t('Creator') }}:</label>
-        <input type="text" v-model=creator readonly>
-      </div>
+<!--    <div class="createTable">-->
+    <!--      <div class="option">-->
+    <!--        <label>{{ $t('Creator') }}:</label>-->
+    <!--        <input type="text" v-model=creator readonly>-->
+    <!--      </div>-->
 
-      <div class="timeInput">
-        <label>{{ $t('creationTime') }}:</label>
-        <input type="text" v-model=creationTime readonly>
-      </div>
-    </div>
+    <!--      <div class="timeInput">-->
+    <!--        <label>{{ $t('creationTime') }}:</label>-->
+    <!--        <input type="text" v-model=creationTime readonly>-->
+    <!--      </div>-->
+    <!--    </div>-->
 
-    <div class="updateTable">
-      <div class="option">
-        <label>{{ $t('lastModifier') }}</label>
-        <input type="text" v-model=lastModifier readonly>
-      </div>
-      <div class="timeInput">
-        <label>{{ $t('lastModificationTime') }}:</label>
-        <input type="text" v-model=lastModificationTime readonly>
-      </div>
-    </div>
+    <!--    <div class="updateTable">-->
+    <!--      <div class="option">-->
+    <!--        <label>{{ $t('lastModifier') }}</label>-->
+    <!--        <input type="text" v-model=lastModifier readonly>-->
+    <!--      </div>-->
+    <!--      <div class="timeInput">-->
+    <!--        <label>{{ $t('lastModificationTime') }}:</label>-->
+    <!--        <input type="text" v-model=lastModificationTime readonly>-->
+    <!--      </div>-->
+    <!--    </div>-->
 
     <label>{{ $t('Type') }}:</label>
     <select v-model="type" required>
@@ -121,6 +121,11 @@ const createUser = () => {
     lastname: lastname.value,
     usergroup: usergroup.value,
     type: type.value,
+    allFiles: {
+      userFiles: [],
+      folders: [],
+      sharedWithMe: [],
+    },
     creator: creator.value,
     creationTime: creatingTime.value,
     lastModifier: lastModifier.value,

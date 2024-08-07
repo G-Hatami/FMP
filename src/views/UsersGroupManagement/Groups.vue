@@ -123,7 +123,7 @@ const toggleUser = (username) => {
 
 }
 const isUserSelected = (username) => {
-  return tempGroupMem.value.includes(username)
+  return tempGroupMem.includes(username)
 
 }
 

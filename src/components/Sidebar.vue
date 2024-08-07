@@ -12,20 +12,20 @@
     <div class="menu">
 
       <router-link :to="{ name : 'index'}" class="button" :class="{ disabled : isUserManagementDisabled}" exact>
-        <span class="material-icons">person</span>
-        <span class="text">Users Management</span>
+        <span class="material-icons" :class="{disabledIcon : isUserManagementDisabled}">person</span>
+        <span class="text" :class="{disabledIcon : isUserManagementDisabled}">Users Management</span>
       </router-link>
       <router-link :to="{name : 'groups'}" class="button" :class="{disabled : isUserGroupManagementDisabled}" exact>
-        <span class="material-icons">group</span>
-        <span class="text">UserGroup management</span>
+        <span class="material-icons" :class="{disabledIcon : isUserGroupManagementDisabled}">group</span>
+        <span class="text" :class="{disabledIcon : isUserGroupManagementDisabled}">UserGroup management</span>
+      </router-link>
+      <router-link :to="{name : 'storage'}" class="button" :class="{disabled : isStorageDisabled}" exact>
+        <span class="material-icons" :class="{disabledIcon : isStorageDisabled}">storage</span>
+        <span class="text" :class="{disabledIcon : isStorageDisabled}">Storage space</span>
       </router-link>
       <router-link :to="{name : 'fileManagement' }" class="button" exact>
         <span class="material-icons">insert_drive_file</span>
         <span class="text">files management</span>
-      </router-link>
-      <router-link :to="{name : 'storage'}" class="button" :class="{disabled : isStorageDisabled}" exact>
-        <span class="material-icons">storage</span>
-        <span class="text">Storage space</span>
       </router-link>
       <router-link :to="{name : 'virtualLogin'}" class="button" exact>
         <span class="material-icons">login</span>
@@ -39,11 +39,11 @@
         </router-link>
       </div>
       <div>
-        <p>{{ userStore.currentUser.username}}</p>
-        <p>{{ userStore.currentUser.type}}</p>
-        <p>{{ userStore.currentUser.theme}}</p>
-        <p>{{ userStore.currentUser.lang}}</p>
-<!--        <p>{{ userStore.currentUser.userUploadedFiles.length}}</p>-->
+        <p>{{ userStore.currentUser.username }}</p>
+        <p>{{ userStore.currentUser.type }}</p>
+        <p>{{ userStore.currentUser.theme }}</p>
+        <p>{{ userStore.currentUser.lang }}</p>
+        <!--        <p>{{ userStore.currentUser.userUploadedFiles.length}}</p>-->
       </div>
     </div>
   </aside>
@@ -53,10 +53,6 @@ import {computed, ref} from "vue";
 import {useUserStore} from "../stores/userStore";
 
 const userStore = useUserStore()
-
-//
-// const time = ref(null)
-// const interval = ref(null)
 
 const isLinkDisabled = (routeName) => {
   if (userStore.currentUser.type === 'User') {
@@ -85,7 +81,11 @@ const toggleMenu = () => {
 <style lang="scss" scoped>
 .disabled {
   pointer-events: none;
-  color: gray;
+  display: none;
+}
+
+.disabledIcon {
+  visibility: hidden;
 }
 
 aside {

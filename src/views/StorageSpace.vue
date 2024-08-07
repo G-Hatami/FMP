@@ -1,13 +1,7 @@
-<script setup>
-
-</script>
-
 <template>
   <div class="container">
-    <h2>Uploaded Files Information</h2><br>
     <div class="table-container">
-
-      <table>
+      <table style="color: #dddddd">
         <thead>
         <tr>
           <th>Owner</th>
@@ -17,39 +11,52 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-          <td>JohnDoe</td>
-          <td>/uploads/file1.txt</td>
-          <td>24 KB</td>
-          <td>2024-07-06 10:30:00</td>
+        <tr v-for="file in allFiles">
+          <td>{{ file.owner }}</td>
+          <td>{{ file.path }}</td>
+          <td>{{ formatFileSize(file.size) }}</td>
+          <td>{{ file.uploadTime }}</td>
         </tr>
-        <tr>
-          <td>JaneSmith</td>
-          <td>/uploads/image.jpg</td>
-          <td>356 KB</td>
-          <td>2024-07-05 15:45:23</td>
-        </tr>
-
         </tbody>
       </table>
     </div>
   </div>
 </template>
+<script setup>
+import {useUserStore} from "../stores/userStore";
+import {computed} from "vue";
 
+
+const userStore = useUserStore()
+const allFiles = computed(() => {
+  let all = [];
+  userStore.users.forEach(user => {
+    user.allFiles.userFiles.forEach(file => {
+          all.push(file)
+        }
+    )
+  })
+  return all
+})
+const formatFileSize = (size) => {
+  if (size < 1024) return `${size} B`;
+  else if (size < 1024 * 1024) return `${(size / 1024).toFixed(2)} KB`;
+  else return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+</script>
 <style scoped lang="scss">
 
 .container {
   position: fixed;
   top: 30px;
   right: 350px;
-  //display: flex;
-  //flex-direction: column;
 }
 
 h2 {
   position: fixed;
   top: 10rem;
-  left: 0rem;
+  left: 0;
   color: #213547;
 }
 
@@ -58,18 +65,7 @@ h2 {
   max-height: 70vh;
   overflow-y: auto;
   display: flex;
-  //justify-content: center;
-  //align-items: center;
-  //margin-bottom: 2rem;
-  //margin-top: 2rem;
-  //position: fixed;
-  //top: 2.5rem;
-  //right: 15rem;
-  //display: flex;
-  //justify-content: center;
   margin-left: 5%;
-
-
 }
 
 

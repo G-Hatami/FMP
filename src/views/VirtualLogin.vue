@@ -7,7 +7,6 @@
     <table>
       <thead>
       <tr>
-
         <th>Username</th>
         <th>First Name</th>
         <th>Last Name</th>
@@ -16,7 +15,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="user in userStore.users" :key="user.id">
+      <tr v-for="user in userStore.users">
         <td>{{ user.username }}</td>
         <td>{{ user.firstname }}</td>
         <td>{{ user.lastname }}</td>
@@ -41,13 +40,7 @@ const router = useRouter();
 const login = (user) => {
   userStore.setCurrentUser(user)
   console.log(user.username)
-  if (user.type === "Admin"){
-    console.log("jkloip")
-    router.push({path: '/'})
-  }
-  else {
-    console.log("user it is")
-  }
+  router.push({path: '/'})
 
 }
 </script>
@@ -58,7 +51,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
-  height: 100vh; /* Full viewport height */
+  height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -69,8 +62,6 @@ body {
   top: 2%;
   padding: 10px;
   text-align: center;
-  //border-bottom: 1px solid #ddd;
-  //flex-shrink: 0; /* Prevent the header from shrinking */
 }
 
 .table-container {
@@ -78,8 +69,8 @@ body {
   top: 16%;
   left: 5.5%;
   width: 100%;
-  flex: 1; /* Take up remaining space */
-  overflow: auto; /* Allow scrolling within this container */
+  flex: 1;
+  overflow: auto;
 }
 
 table {
@@ -89,7 +80,6 @@ table {
 }
 
 td {
-
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
@@ -104,10 +94,10 @@ th {
   border-right: hidden;
 }
 
-/* Optional: Adjust font size for small screens */
+
 @media screen and (max-width: 600px) {
   table {
-    font-size: 0.875em; /* Adjust font size if needed */
+    font-size: 0.875em;
   }
 }
 </style>

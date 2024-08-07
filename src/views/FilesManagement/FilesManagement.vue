@@ -1,5 +1,4 @@
 <template>
-
   <div>
     <div class="first-container">
       <div class="button">
@@ -12,10 +11,20 @@
         <button id="upload-button" onclick="document.getElementById('upload').click()"><i
             class="fa-solid fa-cloud-arrow-up"></i><br> upload file
         </button>
-        <button id="shared-button"><i class="fa-solid fa-share-nodes"></i>shared/share
+        <button @click="showDialogs('isShareProcessDialogOpen' , 'share-process')" id="shared-button"><i
+            class="fa-solid fa-share-nodes"></i>shared/share
         </button>
         <button id="display-button" @click="changeView('allFiles')">Show All Files</button>
         <button id="display-button" @click="changeView('folders')">Show All Folders</button>
+        <div id="view">
+          <button @click="toggleList"><img width="30" height="30"
+                                           src="https://img.icons8.com/ios-filled/50/fcfcfc/list.png" alt="list"/>
+          </button>
+          <button @click="toggleGrid"><img width="30" height="30"
+                                           src="https://img.icons8.com/ios-filled/50/fcfcfc/grid.png" alt="grid"/>
+          </button>
+        </div>
+
       </div>
       <div class="separator">
         <h1>{{ headerText }}</h1>
@@ -32,68 +41,60 @@
       <button @click="showDialogs('isCopyDialogOpen' , 'copy-file' )" style="color: #1e293b "><i
           class="fa-solid fa-copy"></i>Copy
       </button>
-      <button @click="downloadFile" style="color: #1e293b "><i class="fa-solid fa-download"></i>Download</button>
+      <button @click="downloadFile()" style="color: #1e293b "><i class="fa-solid fa-download"></i>Download
+      </button>
       <button @click="showDialogs('isMoveDialogOpen' , 'move-file')" style="color: #1e293b "><i
           class="fa-solid fa-arrow-right"></i>Move
       </button>
-      <button @click="closeFeatures" id="cancel-selection"><i class="fa-solid fa-xmark"></i> {{ selectedFiles.size }}
+      <button @click="closeFeatures" id="cancel-selection"><i class="fa-solid fa-xmark"></i> {{ selectedFiles.length }}
         selected
       </button>
     </div>
     <div class="second-container">
-      <div class="file-container" id="myFilesContainer" v-show="hasUploadedFiles && viewState === 'allFiles'">
-        <div v-for="file in currentUserFiles" :key="file.name" class="file-item">
+      <div v-if="hasFiles && viewState === 'allFiles'" class="file-container" id="myFilesContainer">
+        <div v-for="file in getAllFiles" :key="file" class="file-item">
           <div class="icon-container">
             <img alt="/" :src="getFileIcon(file.name)" class="file-icon"/>
-            <input @change="toggleShowOptions" class="file-checkbox" type="checkbox"
-                   v-model="selectedFiles" :value="file.name"/>
+            <input @change="toggleShowOptions" class="file-checkbox" type="checkbox" :value="file"
+                   v-model="selectedFiles"/>
           </div>
           <div class="url-container">
-            <a :href="file.url" target="_blank">{{ getShortenedName(file.name) }}</a>
+            <a :download="file.name+'.txt'" :href="file.url">{{ getShortenedName(file.name) }}</a>
             <p>{{ formatFileSize(file.size) }}</p>
           </div>
         </div>
       </div>
-      <div class="folder-container" id="createdFoldersContainer" v-show="hasCreatedFolders && viewState === 'folders'">
-        <div v-for="folder in currentUserFolders" :key="folder.name" class="folders-item">
+      <div v-else-if="viewState === 'allFiles'" class="placeholder-container">
+        <p>No files to display. Upload or share files to see them here.</p>
+      </div>
+      <div class="folder-container" id="createdFoldersContainer" v-show="viewState === 'folders'">
+        <div v-for="folder in getAllFolders" :key="folder" class="folders-item">
           <div class="folderIcon">
             <img src="/src/assets/folder.svg" alt="/">
           </div>
-          <div class="nameContainer" @click="changeView('folder', folder.name)">
-            {{ folder.name }}
+          <div class="nameContainer" @click="changeView('folder', folder)">
+            {{ folder }}
           </div>
         </div>
-
-        <!--          <div class="folder-name">-->
-        <!--            {{folder.name}}-->
-        <!--          </div>-->
-
-        <!-- there would be only one image  />-->
-        <!--            <img alt="/" :src=""getFileIcon(file.name) class="file-icon"/>-->
-        <!--            <input @change="toggleShowOptions" class="file-checkbox" type="checkbox"-->
-        <!--                   v-model="selectedFiles" :value="folder.name"/>-->
-
       </div>
       <div class="fileInFolder-container" v-show="viewState ===  'folder'">
-        <div style="color: #dddddd" class="folder-item" v-for="f in filesUploadedInFolder" :key="f.name">
-
+        <div style="color: #dddddd" class="folder-item" v-for="f in getAllFilesInFolder" :key="f.name">
           <div class="icon-container">
             <img alt="/" :src="getFileIcon(f.name)" class="file-icon"/>
             <input @change="toggleShowOptions" class="file-checkbox" type="checkbox"
-                   v-model="selectedFiles" :value="f.name"/>
+                   :value="f" v-model="selectedFiles"/>
           </div>
           <div class="url-container">
-            <a :href="f.url" target="_blank">{{ getShortenedName(f.name) }}</a>
+            <a :download="f.name+'.txt'" :href="f.url" target="_blank">{{ getShortenedName(f.name) }}</a>
             <p>{{ formatFileSize(f.size) }}</p>
           </div>
         </div>
       </div>
     </div>
   </div>
-
   <dialog id="create-folder" v-if="isCreateDialogOpen">
     <h2><i class="fa-solid fa-folder"></i> Create new folder</h2>
-    <input placeholder="Enter folder name" class="folder-name" type="text" v-model="folderName " required>
+    <input placeholder="Enter folder name" class="folder-name" type="text" v-model="folderName" required>
     <button id="cross-button"><i class="fa-solid fa-xmark"
                                  @click="closeDialogs('isCreateDialogOpen' , 'create-folder')"></i></button>
     <div class="create-buttons">
@@ -104,39 +105,160 @@
   <dialog id="delete-file" class="deleteDialog" v-if="isDeleteDialogOpen">
     <button @click="closeDialogs('isDeleteDialogOpen' , 'delete-file')" id="cross-button"><i
         class="fa-solid fa-xmark"></i></button>
-    <h2><i class="fa-solid fa-circle-exclamation" style="color: #64748b;"></i>Delete two items?</h2><br>
-    <p>Are You sure you want to delete files ? if you remove this file it will be send to recycle bin ?</p>
+    <h2><i class="fa-solid fa-circle-exclamation" style="color: #64748b;"></i>Delete items?</h2><br>
+    <p>Are You sure you want to delete files ? </p>
     <div class="deleteBtn">
       <button id="cancelBtn2" @click="closeDialogs('isDeleteDialogOpen' , 'delete-file')">Cancel</button>
       <button id="deleteBtn" @click="deleteSelections">Delete</button>
     </div>
   </dialog>
 
-  <dialog id="copy-file" class="moveDialog" v-if="isCopyDialogOpen">
-    <button @click="closeDialogs('isCopyDialogOpen' , 'copy-file')" id="cross-button"><i class="fa-solid fa-xmark"
-                                                                                         style="color: #1e293b"></i>
+
+  <dialog id="copy-file" class="copyDialog" v-if="isCopyDialogOpen">
+    <button @click="closeDialogs('isCopyDialogOpen', 'copy-file')" id="cross-button">
+      <i class="fa-solid fa-xmark" style="color: #1e293b"></i>
     </button>
-    <div class="folder-container">
+    <div class="destinationList">
+      <table>
+        <tbody style="color:black">
+        <tr v-for="folder in getAllFolders" :key="folder"
+            :class="{ selected: desFolder === folder }"
+            @click="selectDesFolder(folder)">
+          <td>{{ folder }}</td>
+        </tr>
+        <tr :class="{ selected: desFolder === 'ALL FILES' }"
+            @click="selectDesFolder('ALL FILES')">
+          <td>ALL FILES</td>
+        </tr>
+        </tbody>
+      </table>
     </div>
-    <button></button>
-    <button></button>
+    <div class="dialog-buttons">
+      <button @click="copyHere">copy here</button>
+      <button @click="closeDialogs('isCopyDialogOpen', 'copy-file')">cancel</button>
+    </div>
   </dialog>
 
-  <dialog id="move-file" class="copyDialog" v-if="isMoveDialogOpen">
+
+  <dialog id="move-file" class="moveDialog" v-if="isMoveDialogOpen">
     <button @click="closeDialogs('isMoveDialogOpen' , 'move-file')" id="cross-button"><i class="fa-solid fa-xmark"
                                                                                          style="color: #1e293b"></i>
     </button>
-    <div class="folder-container">
+    <div class="destinationList">
+      <table>
+        <tbody style="color:black">
+        <tr v-for="folder in getAllFolders" :key="folder"
+            :class="{ selected: desFolder === folder }"
+            @click="selectDesFolder(folder)">
+          <td>{{ folder }}</td>
+        </tr>
+        <tr :class="{ selected: desFolder === 'ALL FILES' }"
+            @click="selectDesFolder('ALL FILES')">
+          <td>ALL FILES</td>
+        </tr>
+        </tbody>
+      </table>
     </div>
-    <button></button>
-    <button></button>
-
+    <div class="dialog-buttons">
+      <button @click="moveHere">Move Here</button>
+      <button @click="closeDialogs('isMoveDialogOpen', 'move-file')">cancel</button>
+    </div>
   </dialog>
   <dialog id="share-file" class="shareDialog" v-if="isShareDialogOpen">
     <button @click="closeDialogs('isShareDialogOpen' , 'share-file')" id="cross-button"><i class="fa-solid fa-xmark"
                                                                                            style="color: #1e293b"></i>
     </button>
-    <div class="folder-container">
+    <div class="destinationList">
+      <table>
+        <tbody style="color:black">
+        <tr v-for="user in userStore.users.filter(u => u.username !== userStore.currentUser.username)"
+            :key="user.username" :class="{ selected: isSelected(user) }">
+          <td>
+            <input
+                type="checkbox"
+                :value="user"
+                v-model="desSelections"
+            />
+            {{ user.username }}
+          </td>
+        </tr>
+        <tr>
+          <td>Groups:</td>
+        </tr>
+        <tr v-for="group in userStore.groups" :key="group.groupName" :class="{ selected: isSelected(group) }">
+          <td>
+            <input
+                type="checkbox"
+                :value="group"
+                v-model="desSelections"
+            />
+            {{ group.groupName }}
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="dialog-buttons">
+      <button @click="share">Share</button>
+      <button @click="closeDialogs('isShareDialogOpen', 'share-file')">cancel</button>
+    </div>
+  </dialog>
+  <dialog v-if="isShareProcessDialogOpen" class="shareProcessDialog" id="share-process">
+    <button @click="closeDialogs('isShareProcessDialogOpen', 'share-process')" id="cross-button">
+      <i class="fa-solid fa-xmark" style="color: #1e293b"></i>
+    </button>
+    <div class="tabs">
+      <a href="#" :class="{active: currentTab === 'shareWithMe'}" @click.prevent="currentTab = 'shareWithMe'">
+        Share With Me
+      </a>
+      <a href="#" :class="{active: currentTab === 'shareByMe'}" @click.prevent="currentTab = 'shareByMe'">
+        Share By Me
+      </a>
+    </div>
+    <div style="color: black" class="tabContent">
+      <div v-if="currentTab ==='shareWithMe'" class="shareWithMeContent">
+        <div>
+          <table>
+            <thead>
+            <tr>
+              <th>Owner</th>
+              <th>Name</th>
+              <th>URl</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="file in currentSharedWithMe">
+              <td>{{ file.owner }}</td>
+              <td>{{ file.name }}</td>
+              <td>{{ file.url }}</td>
+            </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+      <div v-if="currentTab ==='shareByMe'" class="shareByMeContent">
+        <div class="tableContainer">
+          <table>
+            <thead>
+            <tr>
+              <th>File Name</th>
+              <th>Share with</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="file in currentFiles" :key="file" style="display: flex;">
+              <td>{{ file.name }}
+              </td>
+              <td>
+                <div v-for="f in file.shareWith" :key="f">{{ f }}</div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </dialog>
 
@@ -147,7 +269,20 @@
 // import '@material-icons/font/css/material-icons.css';
 import {useUserStore} from "../../stores/userStore";
 import {computed, ref} from "vue";
+// import {forEach} from "vue-multi-select";
 
+const currentFiles = computed(() => {
+  return userStore.users.find(u => u.username === userStore.currentUser.username).allFiles.userFiles
+})
+const currentSharedWithMe = computed(() => {
+  return userStore.users.find(u => u.username === userStore.currentUser.username).allFiles.sharedWithMe
+})
+const toggleList = () => {
+
+}
+const toggleGrid = () => {
+
+}
 
 const userStore = useUserStore()
 const isCreateDialogOpen = ref(false)
@@ -155,16 +290,113 @@ const isDeleteDialogOpen = ref(false)
 const isCopyDialogOpen = ref(false)
 const isMoveDialogOpen = ref(false)
 const isShareDialogOpen = ref(false)
-const selectedFiles = ref(new Set());//remember this only contains namessssss
+const isShareProcessDialogOpen = ref(false)
+const selectedFiles = ref([])
 const showOptions = ref(false)
 const headerText = ref("My Files")
 const viewState = ref("allFiles")
 const folderName = ref()
 const selectedFolderName = ref()
-const filesUploadedInFolder = ref([])
+const desFolder = ref(null)
+const desSelections = ref([])
+const currentTab = ref('shareWithMe')
+const selectedFilesArray = computed(() =>
+    Array.from(selectedFiles.value))
 const anyFileSelected = computed(() => {
-  return selectedFiles.value.size > 0;
+  return selectedFiles.value.length > 0;
 })
+
+const isSelected = (item) => {
+  const arr = Array.from(desSelections.value)
+  return arr.some(u =>
+      (u.username && u.username === item.username) ||
+      (u.groupName && u.groupName === item.groupName)
+  );
+};
+
+const share = () => {
+  const desSelectionsArray = Array.from(desSelections.value)
+  const userIndex = userStore.users.findIndex(user => user.username === userStore.currentUser.username);
+  console.log(selectedFiles.value)
+  console.log(desSelections.value)
+  userStore.users[userIndex].allFiles.userFiles.forEach(file => {
+        selectedFilesArray.value.forEach(selected => {
+          if (selected.name === file.name) {
+            desSelectionsArray.forEach(des => {
+                  if (!file.shareWith.includes(des.username))
+                    file.shareWith.push(
+                        des.username
+                    )
+                }
+            )
+          }
+        })
+      }
+  )
+  userStore.users.forEach(user => {
+    desSelectionsArray.forEach(des => {
+      if (user.username === des.username) {
+        selectedFilesArray.value.forEach(selected => {
+          user.allFiles.sharedWithMe.push(selected)
+        })
+      }
+    })
+
+  })
+  console.log(userStore.users)
+  console.log("updated store:", userStore.users[userIndex].allFiles.userFiles)
+  closeDialogs("isShareDialogOpen", "share-file")
+  selectedFiles.value = []
+}
+const copyHere = () => {
+  const userIndex = userStore.users.findIndex(user => user.username === userStore.currentUser.username);
+  const destination = desFolder.value === "ALL FILES" ? "/" : `/${desFolder.value}`
+  console.log(destination)
+  const filesArray = Array.from(selectedFiles.value);
+  const filesToCopy = filesArray.map(file => {
+    let count = 0;
+    const toDeleteDuplicates = userStore.users[userIndex].allFiles.userFiles.filter(f => f.folder === destination)
+    console.log(toDeleteDuplicates)
+
+    toDeleteDuplicates.forEach(f => {
+      if (f.name.startsWith(file.name)) {
+        count++;
+      }
+    });
+    const fileNameWithCount = count > 0 ? `${file.name}(${count})` : file.name;
+    const objectURL = window.URL.createObjectURL(new File([""], {type: "text/plain"}));
+    return {
+      name: fileNameWithCount,
+      url: objectURL,
+      size: file.size,
+      folder: destination,
+      shareWith: file.shareWith || []
+    };
+  })
+  console.log(Array.from(filesToCopy))
+  filesToCopy.forEach(file => {
+    userStore.users[userIndex].allFiles.userFiles.push(file);
+  })
+
+  console.log("updated user files ", userStore.users[userIndex].allFiles.userFiles)
+  closeDialogs("isCopyDialogOpen", "copy-files")
+}
+const moveHere = () => {
+  const userIndex = userStore.users.findIndex(user => user.username === userStore.currentUser.username);
+  const destination = desFolder.value === "ALL FILES" ? "/" : `/${desFolder.value}`
+  console.log(destination)
+  const selectedFilesArray = Array.from(selectedFiles.value)
+  userStore.users[userIndex].allFiles.userFiles.forEach(file => {
+    selectedFilesArray.forEach(selectedFile => {
+      if (file.name === selectedFile.name && file.folder === selectedFile.folder) {
+        file.folder = destination
+      }
+    })
+  })
+  closeDialogs("isMoveDialogOpen", "move-file")
+}
+
+
 const changeView = (view, name = '') => {
   viewState.value = view;
   switch (view) {
@@ -179,23 +411,12 @@ const changeView = (view, name = '') => {
     case 'folder':
       headerText.value = `Folder: ${name}`;
       selectedFolderName.value = name
-      filesInFolders()
       closeFeatures()
       break;
     default:
       headerText.value = '';
   }
 
-}
-const filesInFolders = () => {
-  const currentUser = userStore.currentUser.username;
-  const userCreates = userStore.allCreatedFolders.find(user => user.username === currentUser)
-  const createds = userCreates.created
-  console.log("createds are :", createds)
-  const findDesiredCreated = createds.find(folder => folder.name === selectedFolderName.value)
-  console.log("uploads are", findDesiredCreated.uploads)
-  filesUploadedInFolder.value = findDesiredCreated.uploads
-  console.log("after assign", filesUploadedInFolder.value)
 }
 
 const showDialogs = (dialogName, dialogId) => {
@@ -217,6 +438,9 @@ const showDialogs = (dialogName, dialogId) => {
     case 'isMoveDialogOpen':
       isMoveDialogOpen.value = true
       break;
+    case 'isShareProcessDialogOpen':
+      isShareProcessDialogOpen.value = true
+      break;
   }
   document.getElementById(dialogId).showModal()
 }
@@ -230,6 +454,7 @@ const closeDialogs = (dialogName, dialogId) => {
       break;
     case 'isShareDialogOpen' :
       isShareDialogOpen.value = false;
+      desSelections.value = []
       break;
     case 'isMoveDialogOpen' :
       isMoveDialogOpen.value = false;
@@ -237,163 +462,98 @@ const closeDialogs = (dialogName, dialogId) => {
     case 'isCopyDialogOpen' :
       isCopyDialogOpen.value = false;
       break;
+    case 'isShareProcessDialogOpen' :
+      isShareProcessDialogOpen.value = false;
+      break;
   }
   document.getElementById(dialogId).close()
 }
-
-const deleteSelections = () => {
-  const currentUser = userStore.currentUser.username;
-  userStore.allUploaded.find(file => file.username === currentUser && file.folder)
-  // const selectedArray = Array.from(selectedFiles.value);
-//   // if (viewState.value === "allFiles") {
-//   const userUploads = userStore.allUploaded.find(user => user.username === currentUser);
-//   console.log("user is here", userUploads)
-//   console.log('selectedFilesArray:', selectedArray);
-//   userUploads.upload = userUploads.upload.filter(file => !selectedArray.includes(file.name));
-//   // else if (viewState.value === "folder") {
-//   const userCreated = userStore.allCreatedFolders.find(folder => folder.username === currentUser)
-//   console.log(userCreated.created)
-//   const desiredCreated = userCreated.created.find(folder => folder.name === selectedFolderName.value)
-//   console.log(desiredCreated)
-//   filesUploadedInFolder.value = desiredCreated.uploads.filter(uploaded => !selectedArray.includes(uploaded.name))
-// }
-//   selectedFiles.value.clear()
-//   closeDeleteDialog()
-// };}
-
+const selectDesFolder = (folder) => {
+  desFolder.value = folder
 }
+
 
 const handleUploadFile = (event) => {
   const files = event.target.files;
-  const user = userStore.currentUser.username
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i]
-    //if we are uploading in "all files" we should initialize the folder name to null
-    if (viewState.value === "allFiles") {
-      if (userStore.allUploaded.length === 0) {
-        userStore.allUploaded.push({
-          username: user,
-          upload: [{
-            type: "file",
-            name: file.name,
-            url: URL.createObjectURL(file),
-            size: file.size,
-            folder: null
-          }]
-        })
+  const currentUser = userStore.currentUser;
 
-        console.log("this is when length is 0", userStore.allUploaded)
-      }
-      //when people have uploaded files
-      else {
-        const index = userStore.allUploaded.find(u => u.username === user)
-        //if current user uploaded
-        if (index !== undefined) {
-          index.upload.push({
-            type: "file",
-            name: file.name,
-            url: URL.createObjectURL(file),
-            size: file.size,
-            folder: null
-          })
-          const indexNum = userStore.allUploaded.findIndex(u => u.username === index.username)
-          userStore.allUploaded[indexNum] = index
-          console.log("this is when we found user", userStore.allUploaded)
+  // Find the current user
+  const user = userStore.users.find(user => user.username === currentUser.username);
 
 
-        } else {
-          userStore.allUploaded.push({
-            username: user,
-            upload: [{
-              type: "file",
-              name: file.name,
-              url: URL.createObjectURL(file),
-              size: file.size,
-              folder: null
-            }]
-          })
-          console.log("this is when index is undefined", userStore.allUploaded)
-        }
+  // Determine the folder based on the view state
+  let folder;
+  if (viewState.value === "allFiles") {
+    folder = "/";
+  } else if (viewState.value === "folder") {
+    folder = `/${selectedFolderName.value}`;
+  } else {
+    console.error("Unexpected viewState value:", viewState.value);
+    return;
+  }
+
+  Array.from(files).forEach(file => {
+    const objectURL = window.URL.createObjectURL(new File([""], {type: "text/plain"}));
+    if (file instanceof File) {
+      const existingFile = user.allFiles.userFiles.find(f => f.name === file.name && f.folder === folder);
+      if (!existingFile) {
+        user.allFiles.userFiles.push({
+          owner: user.username,
+          name: file.name.substring(0, file.name.lastIndexOf('.')),
+          url: objectURL,
+          size: file.size,
+          folder: folder,
+          path: folder,
+          uploadTime: recordTime(),
+          shareWith: []
+        });
       }
     }
-  }
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i]
-    if (viewState.value === "folder") {
-      const findingOwner = userStore.allCreatedFolders.find(folder => folder.username === user)
-      const findingCreated = findingOwner.created.find(folder => folder.name === selectedFolderName.value)
-      console.log(findingCreated)
-      //if the user have not uploaded any files in selected folder
-      findingCreated.uploads.push({
-        type: "file",
-        name: file.name,
-        url: URL.createObjectURL(file),
-        size: file.size,
-        folder: selectedFolderName.value
-      })
-    }
-  }
+  })
+  files.value = null
+  console.log("Updated user files:", user.allFiles.userFiles);
 }
-const currentUserFiles = computed(() => {
-  const currentUser = userStore.currentUser.username;
-  const userUploads = userStore.allUploaded.find(user => user.username === currentUser);
-  console.log(userUploads)
-  return userUploads ? userUploads.upload : [];
-});
-const hasUploadedFiles = computed(() => {
-  const currentUser = userStore.currentUser.username;
-  const userUploads = userStore.allUploaded.find(user => user.username === currentUser);
-  return userUploads && userUploads.upload.length > 0;
-});
+const recordTime = () => {
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
+};
 
 const createFolder = (createdFolderName) => {
   if (folderName.value !== "") {
-    console.log(createdFolderName)
     changeView('folders')
-    closeDialogs('isCreateDialogOpen' , 'create-folder')
-    const currentUser = userStore.currentUser.username
-    const findUser = userStore.allCreatedFolders.find(u => u.username === currentUser)
-//if our desired do not exist
-    if (findUser === undefined) {
-      userStore.allCreatedFolders.push({
-        username: currentUser,
-        created: [{
-          type: "folder",
-          name: createdFolderName,
-          uploads: []
-        }]
-      })
-      console.log("this is when index is undefined", userStore.allCreatedFolders)
-      folderName.value = ""
-    }
-    //if our desired had created before
-    else {
-      findUser.created.push({
-            type: "folder",
-            name: createdFolderName,
-            uploads: []
-          }
-      )
-      const findIndex = userStore.allCreatedFolders.find(u => u.username === findUser.username)
-      userStore.allCreatedFolders[findIndex] = findUser
-      console.log("this is when we found user", userStore.allCreatedFolders)
-      folderName.value = ""
-    }
+    closeDialogs('isCreateDialogOpen', 'create-folder')
+    const user = userStore.users.find(user => user.username === userStore.currentUser.username)
+    user.allFiles.folders.push(createdFolderName)
+    console.log(user.allFiles.folders)
   } else {
     alert("Please set a name for your folder")
   }
+  folderName.value = ''
 }
-const currentUserFolders = computed(() => {
-  const currentUser = userStore.currentUser.username;
-  const userCreates = userStore.allCreatedFolders.find(user => user.username === currentUser);
-  return userCreates ? userCreates.created : [];
-});
-const hasCreatedFolders = computed(() => {
-  const currentUser = userStore.currentUser.username;
-  const userCreates = userStore.allCreatedFolders.find(user => user.username === currentUser);
-  return userCreates && userCreates.created.length > 0;
-});
 
+const getAllFiles = computed(() => {
+  const currentUser = userStore.currentUser.username;
+  const user = userStore.users.find(user => user.username === currentUser);
+  return (user?.allFiles?.userFiles || []).filter(file => file.folder === '/');
+})
+const hasFiles = computed(() => {
+  const files = getAllFiles.value;
+  return Array.isArray(files) && files.length > 0;
+})
+
+const getAllFolders = computed(() => {
+  const currentUser = userStore.currentUser.username;
+  const user = userStore.users.find(user => user.username === currentUser);
+  return user?.allFiles?.folders || [];
+});
+const getAllFilesInFolder = computed(() => {
+  const currentUser = userStore.currentUser.username;
+  const user = userStore.users.find(user => user.username === currentUser);
+  return (user?.allFiles?.userFiles || []).filter(file => file.folder === `/${selectedFolderName.value}`);
+})
 
 const getFileIcon = (fileName) => {
   // console.log(fileName)
@@ -420,13 +580,13 @@ const toggleShowOptions = () => {
   console.log(selectedFiles.value)
 }
 const closeFeatures = () => {
-  selectedFiles.value.clear()
+  selectedFiles.value = []
   showOptions.value = false
 }
 const downloadFile = () => {
-  for (let i = 1; i <= selectedFiles.value.size; i++) {
-    const blob = new Blob([""], {type: "text/plain"});
-    const url = window.URL.createObjectURL(blob);
+  for (let i = 1; i <= selectedFiles.value.length; i++) {
+    const file = new File([""], {type: "text/plain"});
+    const url = window.URL.createObjectURL(file);
     const a = document.createElement('a');
     a.style.display = 'none';
     a.href = url;
@@ -437,6 +597,25 @@ const downloadFile = () => {
     window.URL.revokeObjectURL(url);
   }
 }
+const deleteSelections = () => {
+  const userIndex = userStore.users.findIndex(user => user.username === userStore.currentUser.username);
+  console.log(selectedFiles.value)
+
+  if (userIndex !== -1) {
+    if (viewState.value === "allFiles") {
+      userStore.users[userIndex].allFiles.userFiles = userStore.users[userIndex].allFiles.userFiles.filter(file =>
+          // Filter out files with folder "/" and name in selectedFileNamesAndFolders
+          !(file.folder === "/" && Array.from(selectedFiles.value).some(selected => selected.name === file.name))
+      );
+    } else if (viewState.value === "folder") {
+      userStore.users[userIndex].allFiles.userFiles = userStore.users[userIndex].allFiles.userFiles.filter(file =>
+          !(file.folder === `/${selectedFolderName.value}` && Array.from(selectedFiles.value).some(selectedFile => selectedFile.name === file.name)))
+    }
+  }
+  closeDialogs('isDeleteDialogOpen', 'delete-file');
+  selectedFiles.value = [];
+}
+
 
 </script>
 
@@ -571,13 +750,18 @@ const downloadFile = () => {
   border-style: groove;
 }
 
+#view {
+  position: fixed;
+  top: 4.5rem;
+  right: 4rem;
+}
+
 
 #cross-button {
   position: absolute;
   border-radius: 10px;
   outline: #1c2841;
   top: 0;
-  right: 0;
 }
 
 //the dialog
@@ -816,16 +1000,6 @@ h1 {
   color: white;
 }
 
-.copyDialog, .moveDialog {
-  position: fixed;
-  top: 8.5%;
-  left: 21.5%;
-  border-radius: 10px;
-  width: 920px;
-  height: 600px;
-  background-color: Rgba(255, 255, 255, 1.2);
-  box-shadow: 6px 8px 5px var(--dark);
-}
 
 .shareDialog {
   position: fixed;
@@ -844,4 +1018,170 @@ h1 {
   'GRAD' 0,
   'opsz' 48
 }
+
+//copy dialog
+.copyDialog, .moveDialog, .shareDialog {
+  position: fixed;
+  top: 8.5%;
+  left: 21.5%;
+  border-radius: 10px;
+  width: 920px;
+  height: 600px;
+  background-color: rgba(255, 255, 255, 0.95); /* Adjusted opacity for better appearance */
+  box-shadow: 6px 8px 5px var(--dark);
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+input[type="checkbox"] {
+  margin-right: 8px;
+  width: 20px;
+  height: 20px;
+}
+
+#cross-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  width: 10px;
+  height: 10px;
+}
+
+.destinationList {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-top: 40px;
+  font-size: 20px;
+}
+
+table {
+  width: 100%;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+}
+
+td:last-child {
+  border-bottom: none;
+}
+
+tr {
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+tr:hover {
+  background-color: #f0f0f0;
+}
+
+tr.selected {
+  background-color: #B0C4DE;
+  font-weight: bolder;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.dialog-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.dialog-buttons button:first-of-type {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.dialog-buttons button:last-of-type {
+  background-color: #f44336;
+  color: white;
+}
+
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.shareProcessDialog {
+  position: absolute;
+  top: 8.5%;
+  left: 21.5%;
+  width: 920px;
+  height: 600px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 6px 8px 5px var(--dark);
+  padding: 20px;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.tabs {
+  position: relative;
+  display: flex;
+  width: 96%;
+  align-items: center;
+  border-bottom: 2px solid #ddd;
+  background-color: transparent;
+}
+
+.tabs a {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  color: #333;
+  background: #f5f5f5;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.tabs a.active {
+  border-bottom: 4px solid blue;
+  background: #fff;
+  font-weight: bolder;
+}
+
+.tableContainer {
+  position: relative;
+  height: calc(100% - 40px); /* Adjust the height as needed */
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.shareByMeContent table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.shareByMeContent th, .shareByMeContent td {
+  border: 1px solid gray;
+  padding: 8px;
+  text-align: left;
+}
+
+.shareByMeContent th {
+  background-color: #f2f2f2;
+}
+
+
 </style>
