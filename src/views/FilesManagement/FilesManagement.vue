@@ -51,7 +51,8 @@
       </button>
     </div>
     <div class="second-container">
-      <div v-if="hasFiles && viewState === 'allFiles'" class="file-container" id="myFilesContainer">
+      <div v-if="hasFiles && viewState === 'allFiles' && gridView === true" class="file-container"
+           id="myFilesContainer">
         <div v-for="file in getAllFiles" :key="file" class="file-item">
           <div class="icon-container">
             <img alt="/" :src="getFileIcon(file.name)" class="file-icon"/>
@@ -64,10 +65,47 @@
           </div>
         </div>
       </div>
-      <div v-else-if="viewState === 'allFiles'" class="placeholder-container">
+      <div v-else-if="viewState === 'allFiles' && gridView === true" class="placeholder-container">
         <p>No files to display. Upload or share files to see them here.</p>
       </div>
-      <div class="folder-container" id="createdFoldersContainer" v-show="viewState === 'folders'">
+      <div v-else-if="listView === true && viewState === 'allFiles' ">
+        <div class="list-elements">
+          <div class="root" @click="toggleSubOptions">All Files ( / )</div>
+          <div class="children">
+            <div class="children-1" style="color: #dddddd" v-for="file in currentAllFiles" v-if="isSubOpen">
+              <div>
+                <input @change="toggleShowOptions" type="checkbox" class="inputInList" :value="file"
+                       v-model="selectedFiles"/>
+                <i class="fa-solid fa-file" style="color: #f2f2f2;"></i> <a style="color: #dddddd"
+                                                                            :download="file.name+'.txt'"
+                                                                            :href="file.url">
+                {{ getShortenedName(file.name) }}</a>
+              </div>
+            </div>
+
+            <div class="children-1" v-if="isSubOpen" v-for="folder in currentFolders">
+              <img @click="toggleFolder(folder)" width="20" height="20"
+                   src="https://img.icons8.com/ios-glyphs/100/fcfcfc/expand-arrow--v1.png"
+                   alt="expand-arrow--v1"/> <i class="fa-solid fa-folder"></i>
+              {{ folder }}
+              <transition name="fade">
+                <div class="folder-content" v-if="isFolderOpen(folder)">
+                  <div v-for="file in getFilesInFolder(folder)" :key="file.name" class="file-item">
+                    <input @change="toggleShowOptions" type="checkbox" class="inputInList" :value="file"
+                           v-model="selectedFiles"/>
+                    <a style="color: #dddddd"
+                       :download="file.name+'.txt'"
+                       :href="file.url">{{ getShortenedName(file.name) }}</a>
+                  </div>
+                </div>
+              </transition>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="folder-container" id="createdFoldersContainer" v-if="viewState === 'folders'">
         <div v-for="folder in getAllFolders" :key="folder" class="folders-item">
           <div class="folderIcon">
             <img src="/src/assets/folder.svg" alt="/">
@@ -92,6 +130,7 @@
       </div>
     </div>
   </div>
+
   <dialog id="create-folder" v-if="isCreateDialogOpen">
     <h2><i class="fa-solid fa-folder"></i> Create new folder</h2>
     <input placeholder="Enter folder name" class="folder-name" type="text" v-model="folderName" required>
@@ -266,23 +305,45 @@
 
 
 <script setup>
-// import '@material-icons/font/css/material-icons.css';
 import {useUserStore} from "../../stores/userStore";
 import {computed, ref} from "vue";
-// import {forEach} from "vue-multi-select";
 
+const currentAllFiles = computed(() => {
+  return currentFiles.value.filter(file => file.folder === "/")
+})
 const currentFiles = computed(() => {
   return userStore.users.find(u => u.username === userStore.currentUser.username).allFiles.userFiles
+})
+const currentFolders = computed(() => {
+  return userStore.users.find(u => u.username === userStore.currentUser.username).allFiles.folders
 })
 const currentSharedWithMe = computed(() => {
   return userStore.users.find(u => u.username === userStore.currentUser.username).allFiles.sharedWithMe
 })
+const getFilesInFolder = (folder) => {
+  return currentFiles.value.filter(file => file.folder === `/${folder}`);
+}
 const toggleList = () => {
-
+  gridView.value = false
+  listView.value = true
 }
 const toggleGrid = () => {
-
+  listView.value = false
+  gridView.value = true
 }
+const toggleFolder = (folder) => {
+  const index = openedFolders.value.findIndex(f => f === folder)
+  if (index !== -1) {
+    openedFolders.value.splice(index, 1)
+  } else {
+    openedFolders.value.push(folder)
+  }
+  console.log("opened one", openedFolders.value)
+}
+const isFolderOpen = (folder) => {
+  return Array.from(openedFolders.value).find(f => f === folder)
+}
+//
 
 const userStore = useUserStore()
 const isCreateDialogOpen = ref(false)
@@ -295,16 +356,24 @@ const selectedFiles = ref([])
 const showOptions = ref(false)
 const headerText = ref("My Files")
 const viewState = ref("allFiles")
+const listView = ref(false)
+const gridView = ref(true)
 const folderName = ref()
 const selectedFolderName = ref()
 const desFolder = ref(null)
 const desSelections = ref([])
 const currentTab = ref('shareWithMe')
+const isSubOpen = ref(false)
+const openedFolders = ref([])
 const selectedFilesArray = computed(() =>
     Array.from(selectedFiles.value))
 const anyFileSelected = computed(() => {
   return selectedFiles.value.length > 0;
 })
+const toggleSubOptions = () => {
+  isSubOpen.value = !isSubOpen.value
+  console.log(isSubOpen.value)
+}
 
 const isSelected = (item) => {
   const arr = Array.from(desSelections.value)
@@ -610,6 +679,9 @@ const deleteSelections = () => {
     } else if (viewState.value === "folder") {
       userStore.users[userIndex].allFiles.userFiles = userStore.users[userIndex].allFiles.userFiles.filter(file =>
           !(file.folder === `/${selectedFolderName.value}` && Array.from(selectedFiles.value).some(selectedFile => selectedFile.name === file.name)))
+    } else if (viewState.value === "allFiles" && listView.value === true) {
+      userStore.users[userIndex].allFiles.userFiles = userStore.users[userIndex].allFiles.userFiles.filter(file =>
+          !(file.folder === `/${selectedFolderName.value}` && Array.from(selectedFiles.value).some(selectedFile => selectedFile.name === file.name)))
     }
   }
   closeDialogs('isDeleteDialogOpen', 'delete-file');
@@ -624,6 +696,25 @@ const deleteSelections = () => {
 
 * {
   font-family: Times, Times New Roman, serif;
+}
+
+.folder-content {
+  margin-left: 20px;
+  transition: max-height 0.3s ease;
+  overflow: hidden;
+}
+
+.file-item {
+  margin-top: 5px;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */
+{
+  opacity: 0;
 }
 
 .first-container {
@@ -699,10 +790,50 @@ const deleteSelections = () => {
 .second-container {
   overflow-y: scroll;
   position: fixed;
-  top: 340px;
+  top: 350px;
   left: 180px;
   height: 450px;
   width: 1520px;
+}
+
+.list-elements {
+  position: relative;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 1110px;
+  height: 350px;
+  overflow: hidden;
+}
+
+.root, .children-1 {
+  position: relative;
+  display: flex;
+  text-align: left;
+  width: 1080px;
+  height: 40px;
+  border: #dddddd 2px solid;
+  background-color: transparent;
+  border-radius: 10px;
+  padding-left: 10px;
+  margin-bottom: 5px;
+  font-weight: bolder;
+  font-size: 25px;
+}
+
+.children {
+  overflow-y: scroll;
+  padding-right: 30px;
+}
+
+.files-in-folder {
+  position: relative;
+}
+
+.files {
+  margin-top: 40px;
+  margin-bottom: 20px;
 }
 
 .button {
@@ -842,8 +973,7 @@ h1 {
 }
 
 .folder-container {
-  position: absolute;
-  margin: 10px 0;
+  position: fixed;
   display: grid;
   gap: 35px;
   grid-template-columns: repeat(5, 1fr);
@@ -894,10 +1024,6 @@ h1 {
 
 .file-checkbox {
   display: none;
-}
-
-.icon-container:hover {
-
 }
 
 .icon-container:hover .file-checkbox {
@@ -1132,7 +1258,7 @@ tr.selected {
   padding: 20px;
   flex-direction: column;
   justify-content: space-between;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .tabs {
@@ -1163,14 +1289,15 @@ tr.selected {
 
 .tableContainer {
   position: relative;
-  height: calc(100% - 40px); /* Adjust the height as needed */
-  overflow-y: auto;
+  height: calc(100% - 40px);
+
   margin-top: 10px;
 }
 
 .shareByMeContent table {
   width: 100%;
   border-collapse: collapse;
+  //overflow-y: auto;
 }
 
 .shareByMeContent th, .shareByMeContent td {
