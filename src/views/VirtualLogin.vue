@@ -1,5 +1,5 @@
 <template>
-  <body>
+
   <header class="header">
     <h1>Virtual Login</h1>
   </header>
@@ -28,7 +28,15 @@
       </tbody>
     </table>
   </div>
-  </body>
+
+
+  <ul>
+    <li>dfd</li>
+    <li>dvfdv</li>
+    <li>vdfvdfvfbf</li>
+  </ul>
+
+
 </template>
 
 <script setup>

@@ -16,7 +16,7 @@
       </option>
     </select>
 
-<!--    <div class="createTable">-->
+    <!--    <div class="createTable">-->
     <!--      <div class="option">-->
     <!--        <label>{{ $t('Creator') }}:</label>-->
     <!--        <input type="text" v-model=creator readonly>-->
@@ -120,6 +120,7 @@ const createUser = () => {
     firstname: firstname.value,
     lastname: lastname.value,
     usergroup: usergroup.value,
+    shareByMe: [],
     type: type.value,
     allFiles: {
       userFiles: [],

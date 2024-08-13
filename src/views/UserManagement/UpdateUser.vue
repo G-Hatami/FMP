@@ -147,6 +147,7 @@ const handleUpdates = () => {
     creationTime: userInfo.value.creationTime,
     lastModifier: route.query.lastModifier,
     lastModificationTime: userInfo.lastModificationTime,
+    shareByMe: [],
     allFiles: {
       userFiles: [],
       folders: [],

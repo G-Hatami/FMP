@@ -11,9 +11,11 @@ export const useUserStore = defineStore('userStore', {
             username: "Admin",
             type: "Admin",
             lastModifier: "",
+            shareByMe: [],
             //every file has a folder attribute
             //each file has an object and has some attributed specified to that file
             allFiles: {
+                //userfile contains all files with both type of file and folder
                 userFiles: [],
                 //this contains name of folders
                 folders: [],
