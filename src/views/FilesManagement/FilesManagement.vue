@@ -144,6 +144,12 @@
           <i class="fa-solid fa-xmark" style="color: #1e293b"></i>
         </button>
         <div class="destinationList">
+<!--          <ul>-->
+<!--            <li>-->
+<!--              <input type="checkbox" >-->
+<!--            All Files-->
+<!--            </li>-->
+<!--          </ul>-->
           <folder-tree
               :folders="foldersInTree" :selectedFolders="selectedFolders"
               :expandedFolders="expandedFolders"
@@ -359,9 +365,13 @@ const selectedFolders = []
 const foldersInTree = computed(() => {
   return buildFolderTree(toAccessUser.allFiles.folders)
 })
+// const isInSelection = () =>{
+//   return selectedFolders.find(folder =>)
+// }
 
 const onFolderSelected = (selected) => {
   this.selectedFolders = selected
+  // console.log("which are the selected",selectedFolders)
 }
 const onFolderExpanded = (selected) => {
   this.expandedFolders = selected

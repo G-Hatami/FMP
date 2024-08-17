@@ -25,7 +25,7 @@
 </template>
 <script setup>
 import {ref, watch} from "vue";
-
+const emit = defineEmits(['update:selected' , 'update:expanded']);
 const props = defineProps({
       folders: Array,
       selectedFolders: Array,
@@ -51,7 +51,8 @@ const toggleSelection = (folder) => {
   } else {
     selectedFolders.value.add(folder.path)
   }
-  this.emit('update:selected', selectedFolders.value)
+  console.log("which are the selected", selectedFolders.value)
+  emit('update:selected', selectedFolders.value)
 }
 const toggleExpand = (folder) => {
   const isExpanded = expandedFolders.value.has(folder.path);
@@ -60,19 +61,20 @@ const toggleExpand = (folder) => {
   } else {
     expandedFolders.value.add(folder.path);
   }
-  this.emit('update:expanded', expandedFolders.value);
+  emit('update:expanded', expandedFolders.value);
+  console.log("check emit")
 }
 const isSelected = (folder) => {
   return selectedFolders.value.has(folder.path)
 }
 const updateSelected = () => {
-  this.emit('update:selected', selectedFolders.value)
+  emit('update:selected', selectedFolders.value)
 }
 const isExpanded = (folder) => {
   return expandedFolders.value.has(folder.path)
 }
 const updateExpanded = () => {
-  this.emit('update:expanded', expandedFolders.value)
+  emit('update:expanded', expandedFolders.value)
 }
 </script>
 
