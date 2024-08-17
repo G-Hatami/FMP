@@ -103,21 +103,26 @@ aside {
   color: var(--light);
   transition: 0.2s ease-out;
 
-  #settings {
-    position: absolute;
-    bottom: 2.6rem;
-    width: 99%;
 
-    .material-icons {
-      display: flex;
-      align-items: flex-start;
-    }
-
-    button {
-      width: 100%;
-    }
-
-  }
+//.settings{
+//  position: absolute;
+//  top: 98%;
+//}
+//  #settings {
+//    position: absolute;
+//    bottom: 2.6rem;
+//    width: 99%;
+//
+//    .material-icons {
+//      display: flex;
+//      align-items: flex-start;
+//    }
+//
+//    button {
+//      width: 100%;
+//    }
+//
+//  }
 
   .logo {
     margin-bottom: 1rem;

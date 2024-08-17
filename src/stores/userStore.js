@@ -18,9 +18,11 @@ export const useUserStore = defineStore('userStore', {
                 //userfile contains all files with both type of file and folder
                 userFiles: [],
                 //this contains name of folders
-                folders: [],
                 sharedWithMe: [],
-            }
+                folders: []
+            },
+
+
         }],
         currentUser: {
             username: "Admin",
@@ -28,6 +30,7 @@ export const useUserStore = defineStore('userStore', {
             theme: "blue",
             lang: "EN",
         },
+
         defaultTheme: 'blue',
         groups: [],
         name: "pinia",

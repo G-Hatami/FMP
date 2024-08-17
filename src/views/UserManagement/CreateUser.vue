@@ -123,7 +123,8 @@ const createUser = () => {
     shareByMe: [],
     type: type.value,
     allFiles: {
-      userFiles: [],
+      userFiles: [
+      ],
       folders: [],
       sharedWithMe: [],
     },

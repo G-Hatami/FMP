@@ -1,108 +1,114 @@
-If you want to allow the selection of multiple users, you need to update your code to handle an array of selected users instead of a single user. Here’s how you can adjust the component to support multiple selections:
-
-### Updated Dialog Component for Multiple Selections
-
-#### Template
-
-Update the template to handle multiple selections and toggle the selection status of each user.
-
-```html
 <template>
-  <dialog id="share-file" class="shareDialog" v-if="isShareDialogOpen">
-    <button @click="closeDialogs('isShareDialogOpen', 'share-file')" id="cross-button">
-      <i class="fa-solid fa-xmark" style="color: #1e293b"></i>
-    </button>
-    <div class="destinationList">
-      <table>
-        <tbody>
-          <tr v-for="user in userStore.users" :key="user.username"
-              :class="{ selected: isSelected(user) }" @click="toggleUserSelection(user)">
-            <td>{{ user.username }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="dialog-buttons">
-      <button @click="share">Share</button>
-      <button @click="closeDialogs('isShareDialogOpen', 'share-file')">Cancel</button>
-    </div>
-  </dialog>
+  <ul>
+    <li v-for="folder in folders" :key="folder.path">
+      <div @click="toggleExpand(folder)">
+        <!-- Show expand/collapse icon based on the folder's state -->
+        <span>{{ isExpanded(folder) ? '-' : '+' }}</span>
+        <input
+          type="checkbox"
+          :checked="isSelected(folder)"
+          @change="toggleSelection(folder)"
+        />
+        {{ folder.name }}
+      </div>
+      <!-- Recursively render child folders if the folder is expanded -->
+      <FolderTree
+        v-if="isExpanded(folder) && folder.children && folder.children.length > 0"
+        :folders="folder.children"
+        :selectedFolders="selectedFolders"
+        :expandedFolders="expandedFolders"
+        @update:selected="updateSelected"
+        @update:expanded="updateExpanded"
+      />
+    </li>
+  </ul>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      isShareDialogOpen: false,
-      selectedUsers: [],
-      userStore: {
-        users: [
-          {
-            username: "Admin",
-            type: "Admin",
-            lastModifier: "",
-            allFiles: {
-              userFiles: [],
-              folders: [],
-              sharedWithMe: [],
-            },
-          },
-          // Add more users as needed
-        ],
-      },
-    };
+  name: "FolderTree",
+  props: {
+    folders: Array,
+    selectedFolders: Set,
+    expandedFolders: Set // Pass the Set of expanded folder paths from the parent component
   },
   methods: {
-    closeDialogs(dialogName, dialogId) {
-      this[dialogName] = false;
-      document.getElementById(dialogId).close();
-    },
-    toggleUserSelection(user) {
-      const index = this.selectedUsers.findIndex(u => u.username === user.username);
-      if (index === -1) {
-        this.selectedUsers.push(user);
+    toggleSelection(folder) {
+      const isSelected = this.selectedFolders.has(folder.path);
+      if (isSelected) {
+        this.selectedFolders.delete(folder.path);
       } else {
-        this.selectedUsers.splice(index, 1);
+        this.selectedFolders.add(folder.path);
       }
+      this.$emit('update:selected', new Set(this.selectedFolders));
     },
-    isSelected(user) {
-      return this.selectedUsers.some(u => u.username === user.username);
+    isSelected(folder) {
+      return this.selectedFolders.has(folder.path);
     },
-    share() {
-      // Add your share logic here
-      console.log('Sharing with:', this.selectedUsers);
+    toggleExpand(folder) {
+      const isExpanded = this.expandedFolders.has(folder.path);
+      if (isExpanded) {
+        this.expandedFolders.delete(folder.path);
+      } else {
+        this.expandedFolders.add(folder.path);
+      }
+      this.$emit('update:expanded', new Set(this.expandedFolders));
     },
-  },
+    isExpanded(folder) {
+      return this.expandedFolders.has(folder.path);
+    },
+    updateSelected(selectedFolders) {
+      this.$emit('update:selected', selectedFolders);
+    },
+    updateExpanded(expandedFolders) {
+      this.$emit('update:expanded', expandedFolders);
+    }
+  }
 };
 </script>
 
-<style scoped>
-.selected {
-  background-color: #e0e0e0;
-}
-</style>
-```
 
-### Explanation
 
-1. **Template**:
-   - Use `:class="{ selected: isSelected(user) }"` to apply a class when a user is selected.
-   - Call `toggleUserSelection(user)` to add or remove the user from the `selectedUsers` array.
 
-2. **Data**:
-   - Define `selectedUsers` as an array to hold the selected users.
 
-3. **Methods**:
-   - `toggleUserSelection`: Adds or removes the user from the `selectedUsers` array.
-   - `isSelected`: Checks if a user is in the `selectedUsers` array.
-   - `closeDialogs`: Closes the dialog.
-   - `share`: Handles the sharing logic, now logging the selected users.
+<template>
+  <div>
+    <h3>Select Folders</h3>
+    <FolderTree
+      :folders="folderTree"
+      :selectedFolders="selectedFolders"
+      :expandedFolders="expandedFolders"
+      @update:selected="onFolderSelected"
+      @update:expanded="onFolderExpanded"
+    />
+  </div>
+</template>
 
-4. **Styling**:
-   - The `.selected` class is used to highlight the selected rows.
+<script>
+import FolderTree from './components/FolderTree.vue';
+import { buildFolderTree } from './utils/folderUtils';
 
-### Additional Notes
-
-- Ensure your `userStore` and `users` array are populated correctly.
-- The `share` method should be updated with the actual logic for sharing files with the selected users.
-- This approach allows multiple users to be selected and deselected by clicking on them.
+export default {
+  name: 'FolderDialog',
+  components: { FolderTree },
+  data() {
+    return {
+      folders: [/* your folder array */],
+      folderTree: [],
+      selectedFolders: new Set(),
+      expandedFolders: new Set() // Track which folders are expanded
+    };
+  },
+  created() {
+    this.folderTree = buildFolderTree(this.folders);
+  },
+  methods: {
+    onFolderSelected(selectedFolders) {
+      this.selectedFolders = selectedFolders;
+    },
+    onFolderExpanded(expandedFolders) {
+      this.expandedFolders = expandedFolders; // Update expanded folders state
+    }
+  }
+};
+</script>

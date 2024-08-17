@@ -1,8 +1,6 @@
 <template>
   <div>
     <div class="first-container">
-
-
       <button
           style="position:absolute; left: 130px; top: 265px; width: 100px; height:30px;  background-color: #D3D3D3; justify-items:center ; color: blue"
           v-show="viewState=== 'folder' "
@@ -21,7 +19,7 @@
         <button @click="showDialogs('isShareProcessDialogOpen' , 'share-process')" id="shared-button"><i
             class="fa-solid fa-share-nodes"></i>shared/share
         </button>
-        <div id="view">
+        <div class="view">
           <button @click="toggleList"><img width="25" height="25"
                                            src="https://img.icons8.com/ios-filled/50/fcfcfc/list.png" alt="list"/>
           </button>
@@ -51,8 +49,9 @@
           </button>
         </div>
       </div>
+      <h1>{{ headerText }}</h1>
       <div class="separator">
-        <h1>{{ headerText }}</h1>
+
         <div class="line"></div>
       </div>
     </div>
@@ -69,8 +68,6 @@
             </div>
             <input @change="toggleShowOptions" class="file-checkbox" type="checkbox" :value="doc"
                    v-model="selectedFiles"/>
-
-
           </div>
           <div class="url-container">
             <div v-if="doc.type === 'file'">
@@ -92,41 +89,7 @@
 
 
       <div v-else-if="listView === true && viewState === 'allFiles' ">
-        <file-tree :files="userStore"></file-tree>
-
-        <!--        <div class="list-elements">-->
-        <!--          <div class="root" @click="toggleSubOptions">All Files ( / )</div>-->
-        <!--          <div class="children">-->
-        <!--            <div class="children-1" style="color: #dddddd" v-for="file in currentAllFiles" v-if="isSubOpen">-->
-        <!--              <div>-->
-        <!--                <input @change="toggleShowOptions" type="checkbox" class="inputInList" :value="file"-->
-        <!--                       v-model="selectedFiles"/>-->
-        <!--                <i class="fa-solid fa-file" style="color: #f2f2f2;"></i> <a style="color: #dddddd"-->
-        <!--                                                                            :download="file.name+'.txt'"-->
-        <!--                                                                            :href="file.url">-->
-        <!--                {{ getShortenedName(file.name) }}</a>-->
-        <!--              </div>-->
-        <!--            </div>-->
-
-        <!--            <div class="children-1" v-if="isSubOpen" v-for="folder in currentFolders">-->
-        <!--              <img @click="toggleFolder(folder)" width="20" height="20"-->
-        <!--                   src="https://img.icons8.com/ios-glyphs/100/fcfcfc/expand-arrow&#45;&#45;v1.png"-->
-        <!--                   alt="expand-arrow&#45;&#45;v1"/> <i class="fa-solid fa-folder"></i>-->
-        <!--              {{ folder }}-->
-        <!--              <transition name="fade">-->
-        <!--                <div class="folder-content" v-if="isFolderOpen(folder)">-->
-        <!--                  <div v-for="file in getFilesInFolder(folder)" :key="file.name" class="file-item">-->
-        <!--                    <input @change="toggleShowOptions" type="checkbox" class="inputInList" :value="file"-->
-        <!--                           v-model="selectedFiles"/>-->
-        <!--                    <a style="color: #dddddd"-->
-        <!--                       :download="file.name+'.txt'"-->
-        <!--                       :href="file.url">{{ getShortenedName(file.name) }}</a>-->
-        <!--                  </div>-->
-        <!--                </div>-->
-        <!--              </transition>-->
-        <!--            </div>-->
-        <!--          </div>-->
-        <!--        </div>-->
+        <!--        <file-tree :files="userStore"></file-tree>-->
       </div>
       <div class="fileInFolder-container" v-show="viewState ===  'folder'">
         <div style="color: #dddddd" class="folder-item" v-for="doc in getAllFilesInFolder" :key="doc">
@@ -181,19 +144,35 @@
           <i class="fa-solid fa-xmark" style="color: #1e293b"></i>
         </button>
         <div class="destinationList">
-          <table>
-            <tbody style="color:black">
-            <tr v-for="folder in getAllFolders" :key="folder"
-                :class="{ selected: desFolder === folder }"
-                @click="selectDesFolder(folder)">
-              <td>{{ folder.name }}</td>
-            </tr>
-            <tr :class="{ selected: desFolder === 'ALL FILES' }"
-                @click="selectDesFolder('ALL FILES')">
-              <td>ALL FILES</td>
-            </tr>
-            </tbody>
-          </table>
+          <folder-tree
+              :folders="foldersInTree" :selectedFolders="selectedFolders"
+              :expandedFolders="expandedFolders"
+              @update:selected="onFolderSelected"
+              @update:expanded="onFolderExpanded">
+          </folder-tree>
+          <!--          <ul>-->
+          <!--            <li v-for="folder in parents" :key="folder">-->
+          <!--              <input type="checkbox" :value="folder" v-model="desFolder">-->
+          <!--              <a :href="goToChildren(folder.name)">{{ folder.name }}</a>-->
+          <!--              &lt;!&ndash;              <div @click="goToChildren()">&ndash;&gt;-->
+          <!--              &lt;!&ndash;             &ndash;&gt;-->
+          <!--              &lt;!&ndash;              </div>&ndash;&gt;-->
+          <!--            </li>-->
+          <!--          </ul>-->
+
+          <!--            <tbody style="color:black">-->
+          <!--            <tr v-for="folder in getAllFolders" :key="folder"-->
+          <!--                :class="{ selected: desFolder === folder }"-->
+          <!--                @click="selectDesFolder(folder)">-->
+          <!--              <td>-->
+          <!--                {{ folder.name }}</td>-->
+          <!--            </tr>-->
+          <!--            <tr :class="{ selected: desFolder === 'ALL FILES' }"-->
+          <!--                @click="selectDesFolder('ALL FILES')">-->
+          <!--              <td>ALL FILES</td>-->
+          <!--            </tr>-->
+          <!--            </tbody>-->
+
         </div>
         <div class="dialog-buttons">
           <button @click="copyHere">copy here</button>
@@ -333,13 +312,10 @@
 
 
 <script setup>
-import FileTree from "./FileTree.vue";
+import FolderTree from "./FolderTree.vue";
 import {useUserStore} from "../../stores/userStore";
 import {computed, ref} from "vue";
-
-const currentFiles = computed(() => {
-  return userStore.users.find(u => u.username === userStore.currentUser.username).allFiles.userFiles
-})
+import {buildFolderTree} from "./FolderUtils.js"
 
 const currentSharedWithMe = computed(() => {
   return userStore.users.find(u => u.username === userStore.currentUser.username).allFiles.sharedWithMe
@@ -376,15 +352,29 @@ const selectedFolderName = ref()
 const desFolder = ref()
 const desSelections = ref([])
 const currentTab = ref('shareWithMe')
-const isSubOpen = ref(false)
-// const openedFolders = ref([])
+const toAccessUser = userStore.users.find(user => user.username === userStore.currentUser.username)
+const expandedFolders = []
+const selectedFolders = []
 
+const foldersInTree = computed(() => {
+  return buildFolderTree(toAccessUser.allFiles.folders)
+})
+
+const onFolderSelected = (selected) => {
+  this.selectedFolders = selected
+}
+const onFolderExpanded = (selected) => {
+  this.expandedFolders = selected
+}
 
 const selectedFilesArray = computed(() =>
     Array.from(selectedFiles.value))
+
+
 const anyFileSelected = computed(() => {
   return selectedFiles.value.length > 0;
 })
+
 
 
 const isSelected = (item) => {
@@ -437,15 +427,7 @@ const share = () => {
         })
       }
   )
-  // userStore.users.forEach(user => {
-  //   desSelectionsArray.forEach(des => {
-  //     if (user.username === des.username) {
-  //       selectedFilesArray.value.forEach(selected => {
-  //         user.allFiles.sharedWithMe.push(selected)
-  //       })
-  //     }
-  //   })
-  // })
+
   console.log(userStore.users)
   console.log("updated store:", userStore.users[userIndex].allFiles.userFiles)
   closeDialogs("isShareDialogOpen", "share-file")
@@ -464,31 +446,7 @@ const copyHere = () => {
         ...file, folder: destination, path: destination
       })
     }
-
-
-    // let count = 0;
-    // const toDeleteDuplicates = userStore.users[userIndex].allFiles.userFiles.filter(f => f.folder === destination)
-    // console.log(toDeleteDuplicates)
-    //
-    // toDeleteDuplicates.forEach(f => {
-    //   if (f.name.startsWith(file.name)) {
-    //     count++;
-    //   }
-    // });
-    // const fileNameWithCount = count > 0 ? `${file.name}(${count})` : file.name;
-    //
-    //   const objectURL = window.URL.createObjectURL(new File([""], {type: "text/plain"}));
-    //   return {
-    //     name: fileNameWithCount,
-    //     url: objectURL,
-    //     size: file.size,
-    //     folder: destination,
-    //     shareWith: file.shareWith || []
-    //   };
-    // })
-    // console.log(Array.from(filesToCopy))
-    // filesToCopy.forEach(file => {
-    //   userStore.users[userIndex].allFiles.userFiles.push(file);
+    userStore.users[userIndex].allFiles.userFiles.push(file);
   })
 
   console.log("updated user files ", userStore.users[userIndex].allFiles.userFiles)
@@ -497,7 +455,7 @@ const copyHere = () => {
 const moveHere = () => {
   const userIndex = userStore.users.findIndex(user => user.username === userStore.currentUser.username);
   console.log(desFolder.value)
-  const destination = desFolder.value === "ALL FILES" ? "/" : `${userStore.users[userIndex].allFiles.folders.find(folder => folder.name === desFolder.value.name).path}/${desFolder.value.name}`
+  const destination = desFolder.value === "ALL FILES" ? "/" : `${userStore.users[userIndex].allFiles.userFiles.find(folder => folder.name === desFolder.value.name && folder.type === 'folder').path}/${desFolder.value.name}`
   console.log(destination)
   const selectedFilesArray = Array.from(selectedFiles.value)
   selectedFilesArray.forEach(selected => {
@@ -521,24 +479,38 @@ const moveHere = () => {
 
   closeDialogs("isMoveDialogOpen", "move-file")
 }
+const getAllFolders = computed(() => {
+  return userStore.users.find(user => user.username === userStore.currentUser.username).allFiles.folders.filter(folders => folders.path === "/")
+})
 
-
+const currentFolder = ref({
+  path: "/",
+  name: ""
+})
 const changeView = (view, name = '') => {
   viewState.value = view;
   switch (view) {
     case 'allFiles':
       headerText.value = 'My Files';
+      currentFolder.value = {
+        name: '',
+        path: '/'
+      }
       closeFeatures()
       break;
     case 'folder':
       headerText.value = `Folder: ${name}`;
       selectedFolderName.value = name
+      currentFolder.value = {
+        name: name,
+        path: userStore.users.find(user => user.username === userStore.currentUser.username).allFiles.folders.find(folder => folder.name === name).path
+      }
+      console.log("current after change:", currentFolder.value)
       closeFeatures()
       break;
     default:
       headerText.value = '';
   }
-
 }
 
 const showDialogs = (dialogName, dialogId) => {
@@ -579,6 +551,7 @@ const closeDialogs = (dialogName, dialogId) => {
       break;
     case 'isMoveDialogOpen' :
       isMoveDialogOpen.value = false;
+
       break;
     case 'isCopyDialogOpen' :
       isCopyDialogOpen.value = false;
@@ -588,6 +561,7 @@ const closeDialogs = (dialogName, dialogId) => {
       break;
   }
   document.getElementById(dialogId).close()
+  selectedFiles.value = [];
 }
 const selectDesFolder = (folder) => {
   desFolder.value = folder
@@ -597,44 +571,37 @@ const selectDesFolder = (folder) => {
 const handelUploadFile = (event) => {
   const files = event.target.files;
   const currentUser = userStore.currentUser;
-
-  // Find the current user
   const user = userStore.users.find(user => user.username === currentUser.username);
-
-  // Determine the folder based on the view state
-  let path;
-  let folder;
-  if (viewState.value === "allFiles") {
-    path = "/";
-    folder = "/"
-  } else if (viewState.value === "folder") {
-    path = `${user.allFiles.folders.find(folder => folder.name === selectedFolderName.value).path}/${selectedFolderName.value}`
-    folder = selectedFolderName
-    console.log("folders????", folder)
-
-  } else {
-    console.error("Unexpected viewState value:", viewState.value);
-    return;
-  }
-
   Array.from(files).forEach(file => {
     const objectURL = window.URL.createObjectURL(new File([""], {type: "text/plain"}));
     if (file instanceof File) {
-      const existingFile = user.allFiles.userFiles.find(f => f.name === file.name && f.folder === folder);
-      if (!existingFile) {
-        //put them in a folder as a child
-        if (viewState.value === 'folder')
+      if (viewState.value === 'folder') {
         user.allFiles.userFiles.push({
           owner: user.username,
           name: file.name.substring(0, file.name.lastIndexOf('.')),
           url: objectURL,
           size: file.size,
-          folder: folder,
-          path: path,
+          folder: currentFolder.value.name,
+          path: currentFolder.value.path,
           uploadTime: recordTime(),
           shareWith: [],
           type: "file"
-        });
+        })
+        console.log("upload in file", currentFolder.value.path)
+
+      } else if (viewState.value === 'allFiles') {
+        console.log("upload in all", currentFolder.value.path)
+        user.allFiles.userFiles.push({
+          owner: user.username,
+          name: file.name.substring(0, file.name.lastIndexOf('.')),
+          url: objectURL,
+          size: file.size,
+          folder: "/",
+          path: currentFolder.value.path,
+          uploadTime: recordTime(),
+          shareWith: [],
+          type: "file"
+        })
       }
     }
   })
@@ -653,87 +620,123 @@ const createFolder = (createdFolderName) => {
   if (folderName.value !== "") {
     closeDialogs('isCreateDialogOpen', 'create-folder')
     const user = userStore.users.find(user => user.username === userStore.currentUser.username)
-    // to create in root
-    if (viewState.value === "allFiles") {
-      // user.allFiles.folders.push({
-      //   owner: user.username,
-      //   path: "/",
-      //   name: createdFolderName,
-      //   url: "",
-      //   size: "",
-      //   type: "folder",
-      // })
-      user.allFiles.userFiles.push({
-        owner: user.username,
-        path: "/",
-        name: createdFolderName,
-        type: "folder",
-        children : []
-      })
+    if (currentFolder.value.path === "/") {
+      user.allFiles.folders.push(
+          {
+            owner: user.username,
+            path: `${currentFolder.value.path}${createdFolderName}`,
+            name: createdFolderName,
+            type: "folder",
+          })
+      console.log("folder:", createdFolderName, user.folders)
+    } else {
+      user.allFiles.folders.push(
+          {
+            owner: user.username,
+            path: `${currentFolder.value.path}/${createdFolderName}`,
+            name: createdFolderName,
+            type: "folder",
+          })
     }
 
-    //to create in another folder
-    else if (viewState.value === "folder") {
-      user.allFiles.userFiles.push({
-        owner: user.username,
-        path: `${user.allFiles.folders.find(folder => folder.name === selectedFolderName.value).path}/${selectedFolderName.value}`,
-        name: createdFolderName,
-        children : [],
-        type: "folder"
-      })
-    }
+
+    // to create in root
+    // if (viewState.value === "allFiles") {
+    //   user.allFiles.folders.push({
+    //     owner: user.username,
+    //     path: "/",
+    //     name: createdFolderName,
+    //     type: "folder",
+    //   })
+    //   console.log("create in all", user.folders)
+    // }
+    //
+    // //to create in another folder
+    // else if (viewState.value === "folder") {
+    //   //if we were in first level
+    //   if (currentFolder.value.path === "/")
+    //   user.allFiles.folders.push({
+    //     owner: user.username,
+    //     path: `${currentFolder.value.path}${currentFolder.value.name}`,
+    //     name: createdFolderName,
+    //     type: "folder"
+    //   })
+
+
   } else {
     alert("Please set a name for your folder")
   }
-
   folderName.value = ''
 }
 
+
+//get all files in root
 const getAllFiles = computed(() => {
   const currentUser = userStore.currentUser.username;
   const user = userStore.users.find(user => user.username === currentUser);
   const allDocs = []
-  user.allFiles.folders.filter(folder => {
-    if (folder.path === `/`) {
-      allDocs.push(folder)
-    }
-  })
   user.allFiles.userFiles.filter(file => {
-    if (file.folder === '/') {
-      allDocs.push(file)
+    // If the path contains exactly two slashes, it's in the root directory
+    if (file.path === "/") {
+      allDocs.push(file);
     }
   })
+  user.allFiles.folders.forEach(folder => {
+    // Count the number of slashes in the path
+    const slashCount = (folder.path.match(/\//g)).length;
+    // If the path contains exactly two slashes, it's in the root directory
+    if (slashCount === 1) {
+      allDocs.push(folder);
+    }
+  });
   console.log(allDocs)
   return allDocs
-
 })
+
 const hasFiles = computed(() => {
   const files = getAllFiles.value;
   console.log(files)
   return Array.isArray(files) && files.length > 0;
 })
 
-const getAllFolders = computed(() => {
-  const currentUser = userStore.currentUser.username;
-  const user = userStore.users.find(user => user.username === currentUser);
-  return user?.allFiles?.folders || [];
-});
+// const getAllFolders = computed(() => {
+//   const currentUser = userStore.currentUser.username;
+//   const user = userStore.users.find(user => user.username === currentUser);
+//   console.log("check the has folders", user?.allFiles?.FirstChildren?.filter(files => files.folder === 'folder'))
+//   return user?.allFiles?.FirstChildren?.filter(files => files.folder === 'folder') || [];
+//
+// });
+
+
 const getAllFilesInFolder = computed(() => {
-  const currentUser = userStore.currentUser.username;
-  const user = userStore.users.find(user => user.username === currentUser);
-  const allDocs = []
-  user.allFiles.folders.filter(folder => {
-    if (folder.path.endsWith(selectedFolderName.value)) {
-      allDocs.push(folder)
+  const user = userStore.users.find(user => user.username === userStore.currentUser.username);
+  const allFilesInFolder = []
+  user.allFiles.folders.forEach(folder => {
+    // Ensure the path starts with currentFolderPath and has exactly one more segment without a trailing slash
+    const regex = new RegExp(`^${currentFolder.value.path}/[^/]+$`);
+    if (regex.test(folder.path)) {
+      allFilesInFolder.push(folder);
+    }
+  });
+  user.allFiles.userFiles.find(file => {
+    if (file.path === currentFolder.value.path) {
+      allFilesInFolder.push(file)
     }
   })
-  user.allFiles.userFiles.filter(file => {
-    if (file.folder.endsWith(selectedFolderName.value)) {
-      allDocs.push(file)
-    }
-  })
-  return allDocs
+  return allFilesInFolder
 })
+// user.allFiles.userFiles.filter(folder => {
+//   if (folder.path.endsWith(selectedFolderName.value)) {
+//     allDocs.push(folder)
+//   }
+// })
+// user.allFiles.userFiles.filter(file => {
+//   if (file.folder.endsWith(selectedFolderName.value)) {
+//     allDocs.push(file)
+//   }
+// })
+// return allDocs
+
 
 const getFileIcon = (fileName) => {
   const extension = fileName.split('.').pop().toLowerCase();
@@ -764,6 +767,7 @@ const closeFeatures = () => {
 }
 const downloadFile = () => {
   for (let i = 1; i <= selectedFiles.value.length; i++) {
+
     const file = new File([""], {type: "text/plain"});
     const url = window.URL.createObjectURL(file);
     const a = document.createElement('a');
@@ -779,43 +783,24 @@ const downloadFile = () => {
 const deleteSelections = () => {
   const userIndex = userStore.users.findIndex(user => user.username === userStore.currentUser.username);
   console.log(selectedFiles.value)
-
   if (userIndex !== -1) {
-    if (viewState.value === "allFiles") {
-      Array.from(selectedFiles.value).forEach(selected => {
-        if (selected.type === "file") {
-          userStore.users[userIndex].allFiles.userFiles = userStore.users[userIndex].allFiles.userFiles.filter(file =>
-              // Filter out files with folder "/" and name in selectedFileNamesAndFolders
-              !(file.folder === "/" && Array.from(selectedFiles.value).some(selected => selected.name === file.name))
-          )
-          console.log("truuuu")
-
-        } else {
-          console.log(selected.name)
-          console.log(userStore.users[userIndex].allFiles.folders)
-          userStore.users[userIndex].allFiles.folders = userStore.users[userIndex].allFiles.folders.filter(folder => folder.name !== selected.name)
-          userStore.users[userIndex].allFiles.userFiles = userStore.users[userIndex].allFiles.userFiles.filter(file => !(file.folder === `/${selected.name}`))
-          console.log(userStore.users[userIndex].allFiles.userFiles)
-          console.log("falssssss")
-        }
-      })
-
-    }
-    console.log(userStore.users[userIndex].allFiles)
-    // } else if (viewState.value === "folder") {
-    //   userStore.users[userIndex].allFiles.userFiles = userStore.users[userIndex].allFiles.userFiles.filter(file =>
-    //       !(file.folder === `/${selectedFolderName.value}` && Array.from(selectedFiles.value).some(selectedFile => selectedFile.name === file.name)))
-    // }
-    // else if (viewState.value === "allFiles" && listView.value === true) {
-    //   userStore.users[userIndex].allFiles.userFiles = userStore.users[userIndex].allFiles.userFiles.filter(file =>
-    //       !(file.folder === `/${selectedFolderName.value}` && Array.from(selectedFiles.value).some(selectedFile => selectedFile.name === file.name)))
-    // }
+    Array.from(selectedFiles.value).forEach(selected => {
+      if (selected.type === "file") {
+        userStore.users[userIndex].allFiles.userFiles =
+            userStore.users[userIndex].allFiles.userFiles.filter(file => file.name !== selected.name)
+      } else if (selected.type === 'folder') {
+        userStore.users[userIndex].allFiles.folders =
+            userStore.users[userIndex].allFiles.folders.filter
+            (folder => folder.name !== selected.name && !folder.path.includes(selected.name))
+        userStore.users[userIndex].allFiles.userFiles = userStore.users[userIndex].allFiles.userFiles.filter(file => !file.path.includes(selected.name))
+        console.log("folders after deletion", userStore.users[userIndex].allFiles.folders)
+        console.log("folders after deletion", userStore.users[userIndex].allFiles.userFiles)
+      }
+    })
   }
   closeDialogs('isDeleteDialogOpen', 'delete-file');
   selectedFiles.value = [];
 }
-
-
 </script>
 
 
@@ -872,7 +857,6 @@ const deleteSelections = () => {
 
 .features button {
   margin: 6px;
-  //margin-left: 4px;
   background: none;
   border: none;
   border-radius: 8px;
@@ -965,7 +949,7 @@ const deleteSelections = () => {
 }
 
 .button {
-  position: fixed;
+  position: absolute;
   top: 4.5rem;
   left: 8rem;
   display: flex;
@@ -1009,7 +993,7 @@ const deleteSelections = () => {
   border-style: groove;
 }
 
-#view {
+.view {
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -1087,15 +1071,14 @@ input::placeholder {
 
 h1 {
   font-weight: bolder;
-  position: fixed;
+  position: absolute;
   left: 8%;
-  top: 25%;
-
+  top: 60%;
 }
 
 .separator {
-  position: fixed;
-  top: 34%;
+  position: absolute;
+  top: 80%;
   left: 8%;
   border-top: 3px solid #cccccc;
   margin: 10px 0 20px;
@@ -1173,15 +1156,17 @@ h1 {
   align-items: flex-start;
   text-align: left;
   color: #cccccc;
+
+
 }
 
 .url-container a {
   text-decoration: none;
   color: #cccccc;
-  font-weight: bolder;
-  font-size: 20px;
-  display: inline;
-  margin-bottom: 2px;
+  font-weight: bold;
+  font-size: 16px;
+  display: flex;
+  width: 190px;
 }
 
 .url-container a:hover {
