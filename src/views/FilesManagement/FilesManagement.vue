@@ -3,8 +3,8 @@
     <div class="first-container">
       <button
           style="position:absolute; left: 130px; top: 265px; width: 100px; height:30px;  background-color: #D3D3D3; justify-items:center ; color: blue"
-          v-show="viewState=== 'folder' "
-          @click="changeView('allFiles')">prev
+          v-if="viewState=== 'folder' "
+          @click="prev">prev
       </button>
       <div class="button">
         <button @click="showDialogs('isCreateDialogOpen' , 'create-folder')" id="create-button"><i
@@ -51,7 +51,6 @@
       </div>
       <h1>{{ headerText }}</h1>
       <div class="separator">
-
         <div class="line"></div>
       </div>
     </div>
@@ -89,9 +88,17 @@
 
 
       <div v-else-if="listView === true && viewState === 'allFiles' ">
-        <!--        <file-tree :files="userStore"></file-tree>-->
+        <files-list
+            :all-file-and-folders="all"
+            :selected-files="selectedFiles"
+            :expanded-files="expandedFiles"
+            :changeView="changeView"
+            @update:expanded="onFileExpanded"
+            @update:selected="onFileSelected"
+        >
+        </files-list>
       </div>
-      <div class="fileInFolder-container" v-show="viewState ===  'folder'">
+      <div class="fileInFolder-container" v-if="viewState ===  'folder' && gridView === true">
         <div style="color: #dddddd" class="folder-item" v-for="doc in getAllFilesInFolder" :key="doc">
           <div class="icon-container">
             <div v-if="doc.type === 'file'">
@@ -118,7 +125,18 @@
         </div>
       </div>
 
+      <div v-if="viewState === 'folder' && listView === true">
+        <files-list
+            :all-file-and-folders="getAllFilesInFolder"
+            :selected-files="selectedFiles"
+            :expanded-files="expandedFiles"
+            :changeView="changeView"
+            @update:expanded="onFileExpanded"
+            @update:selected="onFileSelected"
+        >
+        </files-list>
 
+      </div>
       <dialog id="create-folder" v-if="isCreateDialogOpen" @keydown.enter="createFolder(folderName)">
         <h2><i class="fa-solid fa-folder"></i> Create new folder</h2>
         <input placeholder="Enter folder name" class="folder-name" type="text" v-model="folderName" required>
@@ -144,40 +162,14 @@
           <i class="fa-solid fa-xmark" style="color: #1e293b"></i>
         </button>
         <div class="destinationList">
-<!--          <ul>-->
-<!--            <li>-->
-<!--              <input type="checkbox" >-->
-<!--            All Files-->
-<!--            </li>-->
-<!--          </ul>-->
+
           <folder-tree
               :folders="foldersInTree" :selectedFolders="selectedFolders"
               :expandedFolders="expandedFolders"
               @update:selected="onFolderSelected"
               @update:expanded="onFolderExpanded">
           </folder-tree>
-          <!--          <ul>-->
-          <!--            <li v-for="folder in parents" :key="folder">-->
-          <!--              <input type="checkbox" :value="folder" v-model="desFolder">-->
-          <!--              <a :href="goToChildren(folder.name)">{{ folder.name }}</a>-->
-          <!--              &lt;!&ndash;              <div @click="goToChildren()">&ndash;&gt;-->
-          <!--              &lt;!&ndash;             &ndash;&gt;-->
-          <!--              &lt;!&ndash;              </div>&ndash;&gt;-->
-          <!--            </li>-->
-          <!--          </ul>-->
 
-          <!--            <tbody style="color:black">-->
-          <!--            <tr v-for="folder in getAllFolders" :key="folder"-->
-          <!--                :class="{ selected: desFolder === folder }"-->
-          <!--                @click="selectDesFolder(folder)">-->
-          <!--              <td>-->
-          <!--                {{ folder.name }}</td>-->
-          <!--            </tr>-->
-          <!--            <tr :class="{ selected: desFolder === 'ALL FILES' }"-->
-          <!--                @click="selectDesFolder('ALL FILES')">-->
-          <!--              <td>ALL FILES</td>-->
-          <!--            </tr>-->
-          <!--            </tbody>-->
 
         </div>
         <div class="dialog-buttons">
@@ -190,19 +182,12 @@
                                                                                              style="color: #1e293b"></i>
         </button>
         <div class="destinationList">
-          <table>
-            <tbody style="color:black">
-            <tr v-for="folder in getAllFolders" :key="folder"
-                :class="{ selected: desFolder === folder }"
-                @click="selectDesFolder(folder)">
-              <td>{{ folder.name }}</td>
-            </tr>
-            <tr :class="{ selected: desFolder === 'ALL FILES' }"
-                @click="selectDesFolder('ALL FILES')">
-              <td>ALL FILES</td>
-            </tr>
-            </tbody>
-          </table>
+          <folder-tree
+              :folders="foldersInTree" :selectedFolders="selectedFolders"
+              :expandedFolders="expandedFolders"
+              @update:selected="onFolderSelected"
+              @update:expanded="onFolderExpanded">
+          </folder-tree>
         </div>
         <div class="dialog-buttons">
           <button @click="moveHere">Move Here</button>
@@ -319,9 +304,11 @@
 
 <script setup>
 import FolderTree from "./FolderTree.vue";
+import FilesList from "./FilesList.vue";
 import {useUserStore} from "../../stores/userStore";
 import {computed, ref} from "vue";
 import {buildFolderTree} from "./FolderUtils.js"
+import {buildTree} from "./FolderUtils.js"
 
 const currentSharedWithMe = computed(() => {
   return userStore.users.find(u => u.username === userStore.currentUser.username).allFiles.sharedWithMe
@@ -330,6 +317,20 @@ const currentShareByMe = computed(() => {
   return userStore.users.find(u => u.username === userStore.currentUser.username).shareByMe
 
 })
+const prev = () => {
+  console.log("check prev", currentFolder.value)
+  const slashCount = (currentFolder.value.path.match(/\//g) || []).length;
+  if (slashCount === 1) {
+    console.log("here?")
+    changeView("allFiles")
+    currentFolder.value = toAccessUser.allFiles.folders.find(folder => folder.path === '/')
+    console.log("check check", currentFolder.value)
+  } else {
+    console.log("there?")
+    currentFolder.value = toAccessUser.allFiles.folders.find(folder => folder.path === currentFolder.value.path.substring(0, currentFolder.value.path.lastIndexOf('/')))
+    changeView('folder', currentFolder.value.name)
+  }
+}
 
 const toggleList = () => {
   gridView.value = false
@@ -348,6 +349,7 @@ const isMoveDialogOpen = ref(false)
 const isShareDialogOpen = ref(false)
 const isShareProcessDialogOpen = ref(false)
 const selectedFiles = ref([])
+const expandedFiles = ref([])
 const showOptions = ref(false)
 const headerText = ref("My Files")
 const viewState = ref("allFiles")
@@ -355,27 +357,44 @@ const listView = ref(false)
 const gridView = ref(true)
 const folderName = ref()
 const selectedFolderName = ref()
-const desFolder = ref()
 const desSelections = ref([])
 const currentTab = ref('shareWithMe')
 const toAccessUser = userStore.users.find(user => user.username === userStore.currentUser.username)
-const expandedFolders = []
-const selectedFolders = []
+const expandedFolders = ref()
+const selectedFolders = ref()
+
+
+const all = computed(() => {
+  return buildTree(toAccessUser.allFiles.folders, toAccessUser.allFiles.userFiles)
+})
+
+
+const onFileSelected = (updatedSelectedFiles) => {
+  console.log(updatedSelectedFiles)
+  selectedFiles.value = Array.from(updatedSelectedFiles)
+
+
+}
+const onFileExpanded = (updatedExpandedFiles) => {
+  expandedFiles.value = updatedExpandedFiles
+}
+
 
 const foldersInTree = computed(() => {
+  console.log("before tree", toAccessUser.allFiles.folders)
   return buildFolderTree(toAccessUser.allFiles.folders)
-})
-// const isInSelection = () =>{
-//   return selectedFolders.find(folder =>)
-// }
 
-const onFolderSelected = (selected) => {
-  this.selectedFolders = selected
-  // console.log("which are the selected",selectedFolders)
-}
-const onFolderExpanded = (selected) => {
-  this.expandedFolders = selected
-}
+})
+const onFolderSelected = (updatedSelectedFolders) => {
+  selectedFolders.value = updatedSelectedFolders;
+  console.log('Selected Folders:', selectedFolders.value);
+};
+
+const onFolderExpanded = (updatedExpandedFolders) => {
+  expandedFolders.value = updatedExpandedFolders;
+  console.log('Expanded Folders:', expandedFolders.value);
+};
+
 
 const selectedFilesArray = computed(() =>
     Array.from(selectedFiles.value))
@@ -384,7 +403,6 @@ const selectedFilesArray = computed(() =>
 const anyFileSelected = computed(() => {
   return selectedFiles.value.length > 0;
 })
-
 
 
 const isSelected = (item) => {
@@ -396,7 +414,6 @@ const isSelected = (item) => {
 };
 
 const share = () => {
-  //users I choose
   const desSelectionsArray = Array.from(desSelections.value)
   const userIndex = userStore.users.findIndex(user => user.username === userStore.currentUser.username);
   console.log(selectedFiles.value)
@@ -426,7 +443,6 @@ const share = () => {
                     )
                   }
                   console.log(file.shareWith)
-
                 }
             )
             userStore.users[userIndex].shareByMe.push({
@@ -442,68 +458,66 @@ const share = () => {
   console.log("updated store:", userStore.users[userIndex].allFiles.userFiles)
   closeDialogs("isShareDialogOpen", "share-file")
   selectedFiles.value = []
+  selectedFolders.value = []
+  expandedFolders.value = []
 }
 const copyHere = () => {
-  const userIndex = userStore.users.findIndex(user => user.username === userStore.currentUser.username);
-  const destination = desFolder.value === "ALL FILES" ? "/" : `${userStore.users[userIndex].allFiles.folders.find(folder => folder.name === desFolder.value.name).path}/${desFolder.value.name}`
-  console.log(destination)
+  console.log("selections", selectedFolders.value)
   const filesArray = Array.from(selectedFiles.value);
+  console.log("files array is", filesArray)
   filesArray.forEach(file => {
-    if (file.type === 'file') {
-      userStore.users[userIndex].allFiles.userFiles.push({...file, folder: destination, path: destination})
-    } else {
-      userStore.users[userIndex].allFiles.folders.push({
-        ...file, folder: destination, path: destination
+    if (file.type === "file") {
+      selectedFolders.value.forEach(f => {
+        toAccessUser.allFiles.userFiles.push({...file, folder: f, path: f})
+        console.log("files afterr", toAccessUser.allFiles.userFiles)
       })
     }
-    userStore.users[userIndex].allFiles.userFiles.push(file);
   })
+  closeDialogs('isCopyDialogOpen', 'copy-file')
+  console.log("after copied")
+  selectedFiles.value = []
+  selectedFolders.value = []
+  expandedFolders.value = []
 
-  console.log("updated user files ", userStore.users[userIndex].allFiles.userFiles)
-  closeDialogs("isCopyDialogOpen", "copy-files")
 }
 const moveHere = () => {
-  const userIndex = userStore.users.findIndex(user => user.username === userStore.currentUser.username);
-  console.log(desFolder.value)
-  const destination = desFolder.value === "ALL FILES" ? "/" : `${userStore.users[userIndex].allFiles.userFiles.find(folder => folder.name === desFolder.value.name && folder.type === 'folder').path}/${desFolder.value.name}`
-  console.log(destination)
-  const selectedFilesArray = Array.from(selectedFiles.value)
-  selectedFilesArray.forEach(selected => {
-    if (selected.type === 'file') {
-      userStore.users[userIndex].allFiles.userFiles.forEach(file => {
-        selectedFilesArray.forEach(selectedFile => {
-          if (file.name === selectedFile.name && file.folder === selectedFile.folder) {
-            file.folder = destination
-            console.log(file)
+  console.log("selections", selectedFolders.value)
+  const filesArray = Array.from(selectedFiles.value);
+  console.log("files array is", filesArray)
+  filesArray.forEach(file => {
+    if (file.type === "file") {
+      selectedFolders.value.forEach(f => {
+        toAccessUser.allFiles.userFiles.forEach(files => {
+          if (files.name === file.name && files.path === file.path) {
+            file.path = f
+            files.folder = f
           }
         })
-      })
-    } else if (selected.type === 'folder') {
-      userStore.users[userIndex].allFiles.folders.forEach(folder => {
-        if (folder.name === selected.name) {
-          folder.path = destination
-        }
+
       })
     }
+    console.log("after move", toAccessUser.allFiles.userFiles)
   })
-
   closeDialogs("isMoveDialogOpen", "move-file")
+  console.log("move is closed ")
+  selectedFiles.value = []
+  selectedFolders.value = []
+  expandedFolders.value = []
 }
-const getAllFolders = computed(() => {
-  return userStore.users.find(user => user.username === userStore.currentUser.username).allFiles.folders.filter(folders => folders.path === "/")
-})
+
 
 const currentFolder = ref({
   path: "/",
-  name: ""
+  name: "/"
 })
 const changeView = (view, name = '') => {
+  console.log('changeView called with:', view, name); // Add this log
   viewState.value = view;
   switch (view) {
     case 'allFiles':
       headerText.value = 'My Files';
       currentFolder.value = {
-        name: '',
+        name: '/',
         path: '/'
       }
       closeFeatures()
@@ -572,9 +586,6 @@ const closeDialogs = (dialogName, dialogId) => {
   }
   document.getElementById(dialogId).close()
   selectedFiles.value = [];
-}
-const selectDesFolder = (folder) => {
-  desFolder.value = folder
 }
 
 
@@ -648,31 +659,6 @@ const createFolder = (createdFolderName) => {
             type: "folder",
           })
     }
-
-
-    // to create in root
-    // if (viewState.value === "allFiles") {
-    //   user.allFiles.folders.push({
-    //     owner: user.username,
-    //     path: "/",
-    //     name: createdFolderName,
-    //     type: "folder",
-    //   })
-    //   console.log("create in all", user.folders)
-    // }
-    //
-    // //to create in another folder
-    // else if (viewState.value === "folder") {
-    //   //if we were in first level
-    //   if (currentFolder.value.path === "/")
-    //   user.allFiles.folders.push({
-    //     owner: user.username,
-    //     path: `${currentFolder.value.path}${currentFolder.value.name}`,
-    //     name: createdFolderName,
-    //     type: "folder"
-    //   })
-
-
   } else {
     alert("Please set a name for your folder")
   }
@@ -694,8 +680,11 @@ const getAllFiles = computed(() => {
   user.allFiles.folders.forEach(folder => {
     // Count the number of slashes in the path
     const slashCount = (folder.path.match(/\//g)).length;
+    // if(folder.path.match(/\//g) && folder.path !== "/"){
+
+
     // If the path contains exactly two slashes, it's in the root directory
-    if (slashCount === 1) {
+    if (slashCount === 1 && folder.path !== "/") {
       allDocs.push(folder);
     }
   });
@@ -708,16 +697,6 @@ const hasFiles = computed(() => {
   console.log(files)
   return Array.isArray(files) && files.length > 0;
 })
-
-// const getAllFolders = computed(() => {
-//   const currentUser = userStore.currentUser.username;
-//   const user = userStore.users.find(user => user.username === currentUser);
-//   console.log("check the has folders", user?.allFiles?.FirstChildren?.filter(files => files.folder === 'folder'))
-//   return user?.allFiles?.FirstChildren?.filter(files => files.folder === 'folder') || [];
-//
-// });
-
-
 const getAllFilesInFolder = computed(() => {
   const user = userStore.users.find(user => user.username === userStore.currentUser.username);
   const allFilesInFolder = []
@@ -735,18 +714,6 @@ const getAllFilesInFolder = computed(() => {
   })
   return allFilesInFolder
 })
-// user.allFiles.userFiles.filter(folder => {
-//   if (folder.path.endsWith(selectedFolderName.value)) {
-//     allDocs.push(folder)
-//   }
-// })
-// user.allFiles.userFiles.filter(file => {
-//   if (file.folder.endsWith(selectedFolderName.value)) {
-//     allDocs.push(file)
-//   }
-// })
-// return allDocs
-
 
 const getFileIcon = (fileName) => {
   const extension = fileName.split('.').pop().toLowerCase();

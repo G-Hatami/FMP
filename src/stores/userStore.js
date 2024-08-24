@@ -19,7 +19,13 @@ export const useUserStore = defineStore('userStore', {
                 userFiles: [],
                 //this contains name of folders
                 sharedWithMe: [],
-                folders: []
+                folders: [{
+                    owner: "Admin",
+                    path: '/',
+                    name: "/",
+                    type: "folder",
+                }
+                ]
             },
 
 

@@ -125,7 +125,12 @@ const createUser = () => {
     allFiles: {
       userFiles: [
       ],
-      folders: [],
+      folders: [{
+        owner: username.value,
+        path: `/`,
+        name: '/',
+        type: "folder",
+      }],
       sharedWithMe: [],
     },
     creator: creator.value,
